@@ -1,0 +1,12 @@
+---
+description: Pola Python/Flask di repo ini
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Python
+
+- sqlite3 + `Row`; jangan ORM.
+- Mutasi pakai CSRF. Admin pakai `admin_required`.
+- Normalisasi CSV hanya lewat `normalize.py` / `catalog.py`.
+- Tes privasi harus tetap lulus jika mengubah route atau template profil.

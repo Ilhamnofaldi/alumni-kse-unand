@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Daftar · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="auth wide">
+  {% from "_brand.html" import seal_sm %}
+  {{ seal_sm("kse", "", 74, 58, "auth-crest") }}
+  <h1>Daftar sebagai penerima KSE</h1>
+  <p>Untuk angkatan baru atau nama yang belum ada di direktori. Pengurus memeriksa setiap permintaan sebelum nama tampil dan sebelum Anda bisa masuk.</p>
+  <form method="post" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Nama lengkap <input name="full_name" required autocomplete="name"></label>
+    <div class="split">
+      <label>Fakultas
+        <select name="faculty">
+          <option value="">Belum terdata</option>
+          {% for code, label in faculties.items() %}
+            <option value="{{ code }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Jurusan <input name="major" autocomplete="organization-title"></label>
+    </div>
+    <div class="split">
+      <label>Angkatan <input name="cohort_year" inputmode="numeric" placeholder="Contoh: 2024"></label>
+      <label>Status
+        <select name="status">
+          <option value="">Belum terdata</option>
+          {% for code, label in status_labels.items() %}
+            <option value="{{ code }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+    <label>Tempat kerja atau usaha <input name="workplace"></label>
+    <label>Kota atau alamat domisili <input name="domicile" placeholder="Cukup nama kota bila tidak ingin menulis alamat"></label>
+    <div class="split">
+      <label>Email <input type="email" name="email" required autocomplete="email"></label>
+      <label>WhatsApp <input name="phone" inputmode="tel" autocomplete="tel"></label>
+    </div>
+    <label>Kata sandi baru <input type="password" name="password" required minlength="10" maxlength="128" autocomplete="new-password"></label>
+    <button class="btn" type="submit">Kirim permintaan</button>
+  </form>
+  <p class="fine">Nama belum tampil di direktori sampai pengurus menyetujui. Sudah tercatat di data lama? <a href="{{ url_for('claim_profile') }}">Klaim profil</a>. Sudah punya akun? <a href="{{ url_for('login') }}">Masuk</a>.</p>
+</section>
+{% endblock %}

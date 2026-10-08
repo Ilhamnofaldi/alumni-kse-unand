@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}Statistik · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Statistik</h1>
+  <p>
+    Gambaran singkat isi direktori: alumni KSE Unand berasal dari fakultas mana saja, angkatan berapa saja,
+    sekarang bekerja di bidang apa, dan siapa saja yang pernah mengurus paguyuban.
+    Semua angka dihitung dari nama yang tampil di direktori dan tidak memakai data pribadi.
+    {% if summary.cohort_min and summary.cohort_max %}
+      Angkatan {{ summary.cohort_min }} sampai {{ summary.cohort_max }}.
+    {% endif %}
+  </p>
+</section>
+
+<p class="metrics-caption">Yang sudah terisi</p>
+<section class="metrics" aria-label="Data yang sudah terisi">
+  <article><strong>{{ summary.total or 0 }}</strong><span>Nama tercatat</span></article>
+  <article><strong>{{ summary.officers or 0 }}</strong><span>Pernah jadi pengurus</span></article>
+  <article><strong>{{ summary.with_city or 0 }}</strong><span>Sudah ada kota</span></article>
+  <article><strong>{{ summary.with_status or 0 }}</strong><span>Sudah ada status kerja</span></article>
+</section>
+
+<p class="metrics-caption">Yang belum terdata</p>
+<section class="metrics metrics-quiet" aria-label="Yang belum terdata">
+  <article><strong>{{ summary.missing_faculty or 0 }}</strong><span>Tanpa fakultas</span></article>
+  <article><strong>{{ summary.missing_cohort or 0 }}</strong><span>Tanpa angkatan</span></article>
+  <article><strong>{{ summary.missing_status or 0 }}</strong><span>Tanpa status</span></article>
+  <article><strong>{{ summary.missing_city or 0 }}</strong><span>Tanpa kota</span></article>
+  <article><strong>{{ summary.missing_workplace or 0 }}</strong><span>Tanpa tempat kerja</span></article>
+</section>
+
+<p id="chart-offline" class="empty" hidden>Grafik tidak dapat dimuat. Daftar angka di bawah setiap grafik tetap lengkap.</p>
+
+<div class="charts">
+  <figure class="span-2">
+    <figcaption>Sebaran fakultas</figcaption>
+    <p class="fine">
+      {% if top_faculty %}
+        Paling banyak dari {{ top_faculty.faculty_code|faculty_name }} ({{ top_faculty.n }} nama, {{ top_faculty.share }}%).
+      {% endif %}
+      {{ faculty_n }} nama sudah ada fakultasnya{% if summary.missing_faculty %}; {{ summary.missing_faculty }} nama belum{% endif %}.
+    </p>
+    <div class="chart-box chart-box-tall{% if not by_faculty %} is-empty{% endif %}">
+      <canvas id="chart-faculty" role="img" aria-label="Diagram batang sebaran fakultas"></canvas>
+    </div>
+    <ol class="rank">
+      {% for row in by_faculty %}
+        <li><span>{{ row.faculty_code|faculty_name }}</span><strong>{{ row.n }} <em>{{ row.share }}%</em></strong></li>
+      {% else %}
+        <li class="rank-vacant">Belum ada data fakultas.</li>
+      {% endfor %}
+    </ol>
+  </figure>
+  <figure>
+    <figcaption>Sebaran angkatan</figcaption>
+    <p class="fine">
+      {% if peak_cohort %}Paling banyak angkatan {{ peak_cohort.label }} ({{ peak_cohort.n }} nama).{% endif %}
+      {% if summary.missing_cohort %}{{ summary.missing_cohort }} nama belum ada tahun angkatannya.{% endif %}
+    </p>
+    <div class="chart-box{% if not by_cohort %} is-empty{% endif %}">
+      <canvas id="chart-cohort" role="img" aria-label="Diagram sebaran angkatan"></canvas>
+    </div>
+    <ol class="rank">
+      {% for row in by_cohort %}
+        <li><span>{{ row.label }}</span><strong>{{ row.n }} <em>{{ row.share }}%</em></strong></li>
+      {% else %}
+        <li class="rank-vacant">Belum ada data angkatan.</li>
+      {% endfor %}
+    </ol>
+  </figure>
+  <figure>
+    <figcaption>Status pekerjaan</figcaption>
+    <p class="fine">
+      {% if summary.with_status and summary.total %}
+        Sudah bekerja atau berwirausaha {{ working }} nama
+        ({{ ((working * 100) / summary.with_status)|round|int }}% dari yang sudah ada statusnya).
+      {% endif %}
+    </p>
+    <div class="chart-box chart-box-donut{% if not by_status %} is-empty{% endif %}">
+      <canvas id="chart-status" role="img" aria-label="Diagram status pekerjaan"></canvas>
+      {% if by_status %}
+        <p class="chart-hole"><strong>{{ summary.with_status or 0 }}</strong><span>ada statusnya</span></p>
+      {% endif %}
+    </div>
+    <ol class="rank">
+      {% for row in by_status %}
+        <li><span>{{ row.status_code|status_name }}</span><strong>{{ row.n }} <em>{{ row.share }}%</em></strong></li>
+      {% else %}
+        <li class="rank-vacant">Belum ada data status.</li>
+      {% endfor %}
+    </ol>
+  </figure>
+  <figure class="span-2">
+    <figcaption>Pernah jadi pengurus</figcaption>
+    <p class="fine">
+      {{ summary.officers or 0 }} orang, dihitung dari seluruh periode kepengurusan yang tercatat.
+      Rinciannya per tahun bisa dilihat di halaman <a href="{{ url_for('org_chart') }}">struktur</a>.
+    </p>
+    <div class="chart-box chart-box-donut{% if not by_office %} is-empty{% endif %}">
+      <canvas id="chart-office" role="img" aria-label="Diagram jenis jabatan di paguyuban"></canvas>
+      {% if summary.officers %}
+        <p class="chart-hole"><strong>{{ summary.officers }}</strong><span>orang</span></p>
+      {% endif %}
+    </div>
+    <ol class="rank">
+      {% for row in by_office_kind if row.n %}
+        <li><span>{{ row.label }}</span><strong>{{ row.n }} <em>{{ row.share }}%</em></strong></li>
+      {% else %}
+        <li class="rank-vacant">Belum ada jabatan yang tercatat.</li>
+      {% endfor %}
+    </ol>
+    {% if by_office %}
+      <ol class="rank rank-offices">
+        {% for row in by_office %}
+          <li><span>{{ row.office_code|office_name }}</span><strong>{{ row.n }}</strong></li>
+        {% endfor %}
+      </ol>
+    {% endif %}
+  </figure>
+  <figure class="span-2">
+    <figcaption>Kota tempat alumni tinggal</figcaption>
+    <p class="fine">
+      Hanya kota yang punya sekurang-kurangnya {{ min_count }} nama, supaya satu baris tidak menunjuk ke satu orang saja.
+      Peta memakai batas yang sama. <a href="{{ url_for('map_page') }}">Lihat sebarannya di peta</a>
+    </p>
+    <ol class="rank rank-city">
+      {% for row in by_city %}
+        <li>
+          <span><a href="{{ url_for('directory', kota=row.city) }}">{{ row.city }}</a></span>
+          <strong>{{ row.n }} <em>{{ row.share }}%</em></strong>
+        </li>
+      {% else %}
+        <li class="rank-vacant">Belum ada kota yang mencapai jumlah minimum itu.</li>
+      {% endfor %}
+    </ol>
+    {% if city_more_k or city_below_k %}
+      <p class="fine">
+        {% if city_more_k %}Ada {{ city_more_k }} kota lain ({{ city_more_n }} nama). {% endif %}
+        {% if city_below_k %}{{ city_below_k }} kota belum mencapai jumlah itu ({{ city_below_n }} nama), jadi tidak dirinci di sini.{% endif %}
+      </p>
+    {% endif %}
+  </figure>
+</div>
+<script type="application/json" id="stats-data">{{ chart|tojson }}</script>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/stats.js') }}"></script>
+{% endblock %}

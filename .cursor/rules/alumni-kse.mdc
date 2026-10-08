@@ -1,0 +1,15 @@
+---
+description: Konvensi proyek website alumni KSE UNAND
+alwaysApply: true
+---
+
+# Alumni KSE UNAND
+
+Website paguyuban penerima beasiswa Karya Salemba Empat Universitas Andalas.
+
+- Stack: Flask + SQLite + Jinja. Jangan tambah Node/React kecuali diminta.
+- Jawaban ke pengguna: Bahasa Indonesia. Kode: identifier Inggris.
+- Jangan commit CSV asli, database, atau `.env`.
+- Baca skill project: domain, impor CSV, privasi PII, Flask, QA.
+- UI: arsip cetak universitas (Fraunces/Figtree, kertas, hijau-emas lambang). Bukan dashboard generik.
+- Lambang Paguyuban KSE dan Universitas Andalas dipakai di masthead, beranda, dan footer: `alumni_web/static/img/`.

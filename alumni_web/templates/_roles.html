@@ -1,0 +1,65 @@
+{% macro role_history(roles, delete_endpoint, alumni_id) %}
+  {% set terms = role_terms(roles) %}
+  {% if terms %}
+    <div class="role-history">
+      {% for term in terms %}
+        <section class="role-term">
+          <h3>{{ term.period_label }}</h3>
+          <ul>
+            {% for role in term.roles %}
+              <li>
+                <strong>{{ role['office_code']|office_name(role['scope']) }}</strong>
+                {% if delete_endpoint %}
+                  <form method="post" action="{% if alumni_id %}{{ url_for(delete_endpoint, alumni_id=alumni_id, role_id=role['id']) }}{% else %}{{ url_for(delete_endpoint, role_id=role['id']) }}{% endif %}">
+                    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                    <button class="linkish" type="submit">Hapus</button>
+                  </form>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="fine">Belum ada jabatan yang tercatat.</p>
+  {% endif %}
+{% endmacro %}
+
+{% macro role_form(action, show_bulk=False) %}
+  <form method="post" action="{{ action }}" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <p class="fine">Satu catatan = satu periode kepengurusan. Mengabdi tiga tahun dengan status berbeda berarti tiga catatan. Jabatan yang sama boleh diulang di periode lain. Sekbend ada di setiap divisi; jabatan lain yang hanya muncul di satu periode ditambahkan pengurus lewat Bagan struktur.</p>
+    <div class="split">
+      <label>Jabatan
+        <select name="office_code" {% if not show_bulk %}required{% endif %}>
+          <option value="">Pilih jabatan</option>
+          {% for group in kse_office_groups %}
+            <optgroup label="{{ group.title }}">
+              {% for office in group.offices %}
+                <option value="{{ office.code }}">{{ office.label }}</option>
+              {% endfor %}
+            </optgroup>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Periode
+        <input name="period" placeholder="2023/2024" autocomplete="off" {% if not show_bulk %}required{% endif %}>
+      </label>
+    </div>
+    <label>Fakultas (wajib untuk Penanggung Jawab Fakultas)
+      <select name="scope">
+        <option value="">Tidak terkait fakultas</option>
+        {% for code, label in faculties.items() %}
+          <option value="{{ code }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    {% if show_bulk %}
+      <label>Atau tempel beberapa periode
+        <textarea name="roles_text" rows="3" placeholder="Anggota Humas 2022/2023; Koordinator Pendidikan 2023/2024; Wakil Ketua 2024/2025"></textarea>
+      </label>
+    {% endif %}
+    <button class="btn" type="submit">Tambah jabatan</button>
+  </form>
+{% endmacro %}

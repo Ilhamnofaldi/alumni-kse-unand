@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Tempel daftar · Pengurus{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('admin_home') }}">← Panel pengurus</a></p>
+<section class="auth wide">
+  <h1>Tempel daftar resmi</h1>
+  <p>Satu orang per baris. Kolom dipisah titik koma: nama; fakultas; angkatan; email; WhatsApp. Email dan WhatsApp boleh kosong. Nama belum tampil di direktori sampai ditinjau.</p>
+  <form method="post" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Daftar
+      <textarea name="daftar" rows="12" required placeholder="Siti Rahma; pertanian; 2024; siti@example.com; 0812…"></textarea>
+    </label>
+    <label class="check">
+      <input type="checkbox" name="undang" value="1">
+      Buat tautan undangan untuk setiap nama (ditampilkan sekali setelah disimpan)
+    </label>
+    <button class="btn" type="submit">Tambah kerangka</button>
+  </form>
+  <p class="fine">Baris yang diawali # diabaikan. Maksimal 200 baris. Untuk berkas Excel, unduh <a href="{{ url_for('admin_import_template') }}">template CSV</a> lalu impor.</p>
+</section>
+{% endblock %}

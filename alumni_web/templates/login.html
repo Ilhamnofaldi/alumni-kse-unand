@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Masuk · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="auth">
+  {% from "_brand.html" import seal_sm %}
+  {{ seal_sm("kse", "", 74, 58, "auth-crest") }}
+  <h1>Masuk</h1>
+  <p>Pengurus dan alumni dengan akun aktif dapat melihat WhatsApp dan email. Alamat dan tanggal lahir hanya pemilik profil dan pengurus.</p>
+  <form method="post">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Email <input type="email" name="email" required autocomplete="username"></label>
+    <label>Kata sandi <input type="password" name="password" required autocomplete="current-password"></label>
+    <button class="btn" type="submit">Masuk</button>
+  </form>
+  <p class="fine">Nama baru: <a href="{{ url_for('register_alumni') }}">daftar</a>. Sudah tercatat: <a href="{{ url_for('claim_profile') }}">klaim profil</a>. <a href="{{ url_for('forgot_password') }}">Lupa kata sandi</a>.</p>
+</section>
+{% endblock %}

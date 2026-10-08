@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Pemulihan pengurus · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="auth">
+  <h1>Pemulihan pengurus</h1>
+  <p>Pakai salah satu kode pemulih yang dicatat saat dibuat di panel akun. Setiap kode hanya berlaku sekali.</p>
+  <form method="post">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Email pengurus <input type="email" name="email" required autocomplete="username"></label>
+    <label>Kode pemulih <input name="code" required autocomplete="one-time-code" placeholder="xxxx-xxxx-xxxx-xxxx"></label>
+    <label>Kata sandi baru <input type="password" name="baru" required minlength="10" maxlength="128" autocomplete="new-password"></label>
+    <label>Ulangi kata sandi <input type="password" name="ulang" required minlength="10" maxlength="128" autocomplete="new-password"></label>
+    <button class="btn" type="submit">Ganti kata sandi</button>
+  </form>
+  <p class="fine">Tidak punya kode? Minta pengurus lain, atau di server jalankan <code>python -m alumni_web.cli reset-admin</code>.</p>
+</section>
+{% endblock %}

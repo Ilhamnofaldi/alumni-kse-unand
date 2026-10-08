@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ alumni.full_name|display_name }} · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('directory') }}">← Kembali ke direktori</a></p>
+<article class="profile">
+  <header>
+    <span class="mono lg" aria-hidden="true">{{ alumni.full_name|initials }}</span>
+    <div>
+      <p class="eyebrow">{{ alumni.faculty_code|faculty_name }}{% if alumni.cohort_year %} · Angkatan {{ alumni.cohort_year }}{% endif %}</p>
+      <h1>{{ alumni.full_name|display_name }}</h1>
+      <p>{{ alumni.major_normalized or alumni.major_raw or 'Jurusan belum terdata' }}</p>
+    </div>
+  </header>
+
+  <dl class="facts">
+    <div><dt>Status</dt><dd>{{ alumni.status_code|status_name }}</dd></div>
+    <div><dt>Pekerjaan atau usaha</dt><dd>{{ alumni.workplace or 'Belum terdata' }}</dd></div>
+    <div><dt>Kota</dt><dd>{{ alumni.city or 'Belum terdata' }}{% if alumni.province %} · {{ alumni.province }}{% endif %}</dd></div>
+    <div><dt>Tahun lulus</dt><dd>{{ alumni.graduation_year or alumni.graduation_raw or 'Belum terdata' }}</dd></div>
+    <div><dt>Tahun terakhir menerima KSE</dt><dd>{{ alumni.kse_last_year or alumni.kse_last_raw or 'Belum terdata' }}</dd></div>
+  </dl>
+
+  {% if roles %}
+    <section class="role-block">
+      <h2>Jabatan di KSE UNAND</h2>
+      {% from "_roles.html" import role_history with context %}
+      {{ role_history(roles, none, none) }}
+    </section>
+  {% endif %}
+
+  <section class="pii-box">
+    <h2>Kontak</h2>
+    {% if see_contact %}
+      <dl class="facts">
+        <div><dt>WhatsApp</dt><dd>{{ alumni.phone or 'Belum terdata' }}</dd></div>
+        <div><dt>Email</dt><dd>{{ alumni.email or 'Belum terdata' }}</dd></div>
+        {% if see_sensitive %}
+          <div><dt>Alamat</dt><dd>{{ alumni.domicile or 'Belum terdata' }}</dd></div>
+          <div><dt>Tanggal lahir</dt><dd>{{ alumni.date_of_birth or 'Belum terdata' }}</dd></div>
+        {% endif %}
+      </dl>
+      {% if see_contact and not see_sensitive %}
+        <p class="fine">Alamat dan tanggal lahir hanya dibuka kepada pemilik profil dan pengurus.</p>
+      {% endif %}
+    {% else %}
+      <p>Nomor WhatsApp dan email hanya dibuka untuk anggota yang sudah masuk. Alamat dan tanggal lahir hanya pemilik profil dan pengurus.</p>
+      <p class="toolbar">
+        <a class="btn" href="{{ url_for('login', next=request.path) }}">Masuk</a>
+        <a class="btn btn-ghost" href="{{ url_for('register_alumni') }}">Daftar</a>
+        <a class="btn btn-ghost" href="{{ url_for('claim_profile') }}">Klaim profil</a>
+      </p>
+    {% endif %}
+  </section>
+
+  {% if alumni.testimonial %}
+    <blockquote class="quote">
+      <p>{{ alumni.testimonial }}</p>
+      <cite>Kesan dan pesan sebagai penerima beasiswa KSE</cite>
+    </blockquote>
+  {% endif %}
+</article>
+{% endblock %}

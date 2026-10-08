@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Setel kata sandi · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="auth">
+  <h1>Setel kata sandi baru</h1>
+  <p>Tautan ini sekali pakai. Setelah disimpan, masuk dengan email akun dan kata sandi baru.</p>
+  <form method="post">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Kata sandi baru <input type="password" name="baru" required minlength="10" maxlength="128" autocomplete="new-password"></label>
+    <label>Ulangi kata sandi <input type="password" name="ulang" required minlength="10" maxlength="128" autocomplete="new-password"></label>
+    <button class="btn" type="submit">Simpan</button>
+  </form>
+</section>
+{% endblock %}

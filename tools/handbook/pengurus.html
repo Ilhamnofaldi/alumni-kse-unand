@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Buku saku pengurus · Paguyuban KSE UNAND</title>
+  <link rel="stylesheet" href="print.css">
+</head>
+<body class="book book-admin">
+
+  <article class="page cover">
+    <div class="seals">
+      <img class="seal-kse" src="../../alumni_web/static/img/kse.png" alt="Lambang Paguyuban Karya Salemba Empat Universitas Andalas">
+      <span class="divider"></span>
+      <img class="seal-unand" src="../../alumni_web/static/img/unand.png" alt="Lambang Universitas Andalas">
+    </div>
+    <div class="cover-copy">
+      <p class="kicker">Khusus pengurus</p>
+      <h1>Buku saku pengurus</h1>
+      <p class="subtitle">Cara kerja panel paguyuban: meninjau permintaan anggota, merapikan data, dan menjaga kontak alumni tetap aman.</p>
+    </div>
+    <div>
+      <p class="block-title">Urutan kerja sekali duduk</p>
+      <p class="block-note">Bagan lengkapnya ada di halaman 3.</p>
+    </div>
+    <div class="path">
+      <div class="step">
+        <span class="n">1</span>
+        <div>
+          <h3>Tinjau permintaan yang menunggu</h3>
+          <p>Buka <strong>Tinjau</strong> dari panel, lalu selesaikan satu per satu dari atas.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="n">2</span>
+        <div>
+          <h3>Rapikan satu antrean data</h3>
+          <p>Pilih satu chip antrean di panel, misalnya Perlu dilengkapi atau Nama kembar.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="n">3</span>
+        <div>
+          <h3>Tambahkan nama baru bila ada</h3>
+          <p>Lewat Tambah satu orang, Tempel daftar, atau Impor CSV.</p>
+        </div>
+      </div>
+    </div>
+    <div class="toc">
+      <div><span>Siapa melihat apa</span><span class="pg">2</span></div>
+      <div><span>Bagan alur kerja</span><span class="pg">3</span></div>
+      <div><span>Akun yang menunggu</span><span class="pg">4</span></div>
+      <div><span>Permintaan dari alumni</span><span class="pg">5</span></div>
+      <div><span>Antrean perbaikan data</span><span class="pg">6</span></div>
+      <div><span>Menambah nama baru</span><span class="pg">7</span></div>
+      <div><span>Jabatan dan bagan struktur</span><span class="pg">8</span></div>
+      <div><span>Akun pengurus dan alumni</span><span class="pg">9</span></div>
+      <div><span>Menjaga data pribadi</span><span class="pg">10</span></div>
+      <div><span>Perintah di server</span><span class="pg">11</span></div>
+      <div><span>Bila terjadi kekeliruan</span><span class="pg">12</span></div>
+      <div><span>Ringkasan</span><span class="pg">13</span></div>
+    </div>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Dasar</p>
+      <h1>Siapa melihat apa</h1>
+      <p class="lede">Persetujuan Anda menentukan siapa yang dapat membuka kontak alumni. Halaman ini dasar semua langkah berikutnya.</p>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <th>Peran</th>
+          <th>Yang dapat dilihat</th>
+          <th>Yang dapat diubah</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Pengunjung tanpa akun</strong></td>
+          <td>Nama, fakultas, jurusan, angkatan, pekerjaan, kota, jabatan, kesan-pesan, statistik, dan peta.</td>
+          <td>Tidak ada.</td>
+        </tr>
+        <tr>
+          <td><strong>Alumni dengan akun aktif</strong></td>
+          <td>Semua yang di atas, ditambah nomor WhatsApp, email, alamat, dan tanggal lahir seluruh nama yang tampil di direktori.</td>
+          <td>Data dirinya sendiri: pekerjaan, kota, kontak, kesan-pesan, dan riwayat jabatannya.</td>
+        </tr>
+        <tr>
+          <td><strong>Pengurus</strong></td>
+          <td>Seluruh data, panel, antrean tinjau, ekspor CSV, dan catatan riwayat tindakan.</td>
+          <td>Seluruh baris data, status tampil, jabatan, serta akun alumni dan pengurus.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="grid-2">
+      <article class="card accent">
+        <h3>Satu persetujuan membuka seluruh kontak</h3>
+        <p>Karena akun aktif dapat melihat kontak semua alumni yang tampil, persetujuan sebaiknya diberikan hanya kepada orang yang Anda kenali lewat grup paguyuban.</p>
+      </article>
+      <article class="card accent">
+        <h3>Email yang benar belum membuktikan pemiliknya</h3>
+        <p>Permintaan hanya menunjukkan bahwa pemohon mengetahui email yang tercatat. Pastikan lewat jalur lain sebelum menyetujui.</p>
+      </article>
+    </div>
+    <div class="grid-2">
+      <article class="card">
+        <h3>Tindakan penting tercatat</h3>
+        <p>Persetujuan, penolakan, penghapusan, unduhan ekspor, dan penyetelan sandi tersimpan pada catatan riwayat. Berguna bila kemudian ada pertanyaan.</p>
+      </article>
+      <article class="card">
+        <h3>Alamat IP pada tiap permintaan</h3>
+        <p>Waktu permintaan ditampilkan bersama alamat IP pemohon. Beberapa permintaan janggal dari satu sumber biasanya terlihat dari sini.</p>
+      </article>
+    </div>
+    <div class="note"><strong>Yang tidak pernah terbuka untuk umum.</strong> Nomor WhatsApp, email, alamat, dan tanggal lahir tidak muncul di kartu direktori, halaman statistik, maupun peta. Peta hanya menandai kota yang memiliki 3 alumni atau lebih.</div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">2 / 13</span></footer>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Bagan alur kerja</p>
+      <h1>Sekali duduk di panel</h1>
+      <p class="lede">Deretan tombol di panel tampak seperti ini. Ikuti bagan di bawahnya dari atas ke bawah.</p>
+    </header>
+    <div class="toolbar-mock">
+      <span class="btn-mock">Tinjau</span>
+      <span class="btn-mock ghost">Tambah satu orang</span>
+      <span class="btn-mock ghost">Tempel daftar</span>
+      <span class="btn-mock ghost">Impor CSV</span>
+      <span class="btn-mock ghost">Ekspor CSV</span>
+      <span class="btn-mock ghost">Akun</span>
+    </div>
+    <div class="chart">
+      <div class="cnode">
+        <span class="n">1</span>
+        <div>
+          <h3>Buka Tinjau dari panel</h3>
+          <p>Isinya tiga blok: akun yang menunggu, permintaan dari alumni, dan nama yang belum ditampilkan.</p>
+        </div>
+      </div>
+      <div class="cdown"></div>
+      <p class="cask">Orangnya Anda kenali lewat grup paguyuban?</p>
+      <div class="cdown"></div>
+      <div class="csplit">
+        <article class="cbranch">
+          <p class="tag">Ya, dikenali</p>
+          <h3>Setujui</h3>
+          <p>Pilih Setujui dan tampilkan. Bila namanya sedang disembunyikan atas permintaannya sendiri, pilih Hanya aktifkan akun.</p>
+          <span class="pg">Halaman 4</span>
+        </article>
+        <article class="cbranch alt">
+          <p class="tag">Belum yakin</p>
+          <h3>Tanyakan dahulu</h3>
+          <p>Tanyakan di grup angkatannya dan biarkan permintaan itu menunggu. Bila jelas keliru, baru pilih Tolak.</p>
+          <span class="pg">Halaman 4</span>
+        </article>
+      </div>
+      <p class="cmerge">Setelah blok akun selesai</p>
+      <div class="cdown"></div>
+      <div class="cnode">
+        <span class="n">2</span>
+        <div>
+          <h3>Selesaikan permintaan dari alumni</h3>
+          <p>Ganti email, koreksi nama, permintaan menyembunyikan nama, dan bantuan lupa kata sandi.</p>
+          <span class="pg">Halaman 5</span>
+        </div>
+      </div>
+      <div class="cdown"></div>
+      <div class="cnode">
+        <span class="n">3</span>
+        <div>
+          <h3>Rapikan satu antrean data</h3>
+          <p>Pilih satu chip di panel, lalu kerjakan beberapa baris teratas.</p>
+          <span class="pg">Halaman 6</span>
+        </div>
+      </div>
+      <div class="cdown"></div>
+      <div class="cnode done">
+        <span class="n">4</span>
+        <div>
+          <h3>Tambahkan nama baru bila ada, lalu tutup panel</h3>
+          <p>Nama baru tersimpan dahulu dan ditampilkan setelah diperiksa.</p>
+          <span class="pg">Halaman 7</span>
+        </div>
+      </div>
+    </div>
+    <div class="chart-aside"><strong>Titik paling menentukan</strong> ada pada pertanyaan di tengah bagan. Satu akun aktif dapat melihat nomor dan email seluruh alumni yang tampil di direktori.</div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">3 / 13</span></footer>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Halaman Tinjau · blok pertama</p>
+      <h1>Akun yang menunggu persetujuan</h1>
+      <p class="lede">Tiap baris memuat nama, email, asal data, waktu permintaan, dan alamat IP pemohon.</p>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <th>Tombol</th>
+          <th>Dipakai ketika</th>
+          <th>Akibatnya</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Setujui dan tampilkan</strong></td>
+          <td>Pemohon dikenali dan namanya layak tampil di direktori.</td>
+          <td>Akun menjadi aktif dan nama mulai tampil. Ini pilihan yang biasa dipakai.</td>
+        </tr>
+        <tr>
+          <td><strong>Hanya aktifkan akun</strong></td>
+          <td>Pemohon dikenali, namun namanya sedang disembunyikan atas permintaannya sendiri.</td>
+          <td>Akun aktif, nama tetap tidak tampil di direktori.</td>
+        </tr>
+        <tr>
+          <td><strong>Tolak</strong></td>
+          <td>Pemohon belum dapat dikenali, atau permintaannya ganda.</td>
+          <td>Permintaan ditutup. Baris data yang sudah ada tetap utuh.</td>
+        </tr>
+        <tr>
+          <td><strong>Tolak dan hapus</strong></td>
+          <td>Pendaftaran mandiri yang jelas keliru atau bukan penerima beasiswa KSE.</td>
+          <td>Permintaan ditutup dan baris pendaftarannya ikut dihapus. Tombol ini hanya muncul pada baris dengan asal data <code>self_register</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="grid-2">
+      <article class="card">
+        <h3>Blok ketiga: nama yang belum ditampilkan</h3>
+        <p>Berisi nama yang sudah tersimpan namun belum tampil di direktori. Tersedia <strong>Tampilkan</strong> untuk menaikkan nama ke direktori, dan <strong>Buat undangan</strong> agar orangnya mengisi datanya sendiri.</p>
+      </article>
+      <article class="card">
+        <h3>Setelah menolak sebuah permintaan</h3>
+        <p>Situs tidak mengirim pemberitahuan kepada pemohon. Bila penolakan hanya karena salah kirim atau data belum cocok, kabar singkat di grup biasanya cukup membantu.</p>
+      </article>
+    </div>
+    <div class="note"><strong>Kolom Asal data</strong> menerangkan dari mana baris itu datang: <code>self_register</code> dari pendaftaran mandiri, <code>batch</code> dari tempel daftar, <code>admin</code> dari penambahan satu orang, dan <code>google_form</code> dari impor CSV.</div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">4 / 13</span></footer>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Halaman Tinjau · blok kedua</p>
+      <h1>Permintaan dari alumni</h1>
+      <p class="lede">Jenis permintaan tertulis apa adanya pada kolom Jenis.</p>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <th>Jenis</th>
+          <th>Yang diminta alumni</th>
+          <th>Yang terjadi saat disetujui</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>identity</strong></td>
+          <td>Perbaikan nama, fakultas, jurusan, atau angkatan, disertai catatan penjelasan.</td>
+          <td>Permintaan ditutup saja. Perbaikannya Anda tulis sendiri lewat <strong>Ubah</strong> pada baris orang tersebut.</td>
+        </tr>
+        <tr>
+          <td><strong>email</strong></td>
+          <td>Penggantian alamat email akun.</td>
+          <td>Email pada data dan pada akun langsung berpindah ke alamat baru.</td>
+        </tr>
+        <tr>
+          <td><strong>hide</strong></td>
+          <td>Nama ditutup dari direktori.</td>
+          <td>Nama berhenti tampil dan halaman profilnya tidak lagi dapat dibuka.</td>
+        </tr>
+        <tr>
+          <td><strong>reset</strong></td>
+          <td>Bantuan karena kata sandi terlupa.</td>
+          <td>Ada dua tombol. <strong>Setujui</strong> menutup permintaan, sedangkan <strong>Buat tautan</strong> menghasilkan tautan pemulihan untuk dikirimkan.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="reveal-box">
+      <strong>Tautan hanya ditampilkan satu kali.</strong>
+      Setelah Anda memilih Buat tautan atau Buat undangan, situs membuka halaman khusus berisi tautannya. Salin tautan itu saat halaman masih terbuka.
+      <code>Sampaikan tautan ini lewat WhatsApp paguyuban. Berlaku 14 hari, sekali pakai.</code>
+    </div>
+    <div class="grid-2">
+      <article class="card">
+        <h3>Penggantian email perlu dipastikan dua kali</h3>
+        <p>Email adalah kunci masuk akun. Pastikan permintaannya memang datang dari orangnya, misalnya lewat pesan di grup, sebelum alamatnya dipindahkan.</p>
+      </article>
+      <article class="card">
+        <h3>Mengabari setelah permintaan selesai</h3>
+        <p>Alumni tidak menerima pemberitahuan otomatis. Kabar singkat membuat permintaannya terasa ditanggapi, terutama untuk koreksi nama yang Anda kerjakan manual.</p>
+      </article>
+    </div>
+    <div class="note"><strong>Bila halaman tautan terlanjur tertutup,</strong> tautannya tidak dapat dipanggil kembali. Cukup buat tautan baru dari panel tinjau, dan tautan lama otomatis tidak terpakai.</div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">5 / 13</span></footer>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Langkah 2 dari 3</p>
+      <h1>Antrean perbaikan data</h1>
+      <p class="lede">Deretan chip di panel bekerja sebagai saringan. Angkanya menunjukkan berapa baris yang menunggu.</p>
+    </header>
+    <div class="chips">
+      <span class="chip">Perlu dilengkapi <span class="count">128</span></span>
+      <span class="chip">Hanya nama <span class="count">64</span></span>
+      <span class="chip">Nama kembar <span class="count">7</span></span>
+      <span class="chip">Tanpa angkatan <span class="count">19</span></span>
+      <span class="chip">Tanpa kota <span class="count">42</span></span>
+      <span class="chip">Kota tidak terpetakan <span class="count">11</span></span>
+      <span class="chip">Telepon tidak valid <span class="count">5</span></span>
+      <span class="chip">Minta disembunyikan <span class="count">2</span></span>
+      <span class="chip">Tersembunyi <span class="count">9</span></span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Chip</th>
+          <th>Artinya</th>
+          <th>Langkah yang biasa diambil</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Hanya nama</strong></td>
+          <td>Baris yang baru berisi nama saja.</td>
+          <td>Lengkapi dari catatan paguyuban, atau kirimkan undangan agar orangnya mengisi sendiri.</td>
+        </tr>
+        <tr>
+          <td><strong>Perlu dilengkapi</strong></td>
+          <td>Fakultas, angkatan, kota, atau pekerjaan masih kosong.</td>
+          <td>Isi yang sudah diketahui, sisanya ditanyakan lewat grup angkatan.</td>
+        </tr>
+        <tr>
+          <td><strong>Nama kembar</strong></td>
+          <td>Dua baris atau lebih dengan nama yang serupa.</td>
+          <td>Bandingkan angkatan dan email, satukan isinya ke baris yang paling lengkap, lalu sembunyikan sisanya.</td>
+        </tr>
+        <tr>
+          <td><strong>Tanpa kota</strong> dan <strong>Kota tidak terpetakan</strong></td>
+          <td>Kota kosong, atau ejaannya belum dikenali daftar kota.</td>
+          <td>Tulis nama kota apa adanya. Kota yang belum terpetakan tetap tampil di profil, hanya belum masuk peta.</td>
+        </tr>
+        <tr>
+          <td><strong>Telepon tidak valid</strong></td>
+          <td>Nomor terlalu pendek atau bukan pola nomor Indonesia.</td>
+          <td>Perbaiki setelah nomornya dipastikan kepada yang bersangkutan.</td>
+        </tr>
+        <tr>
+          <td><strong>Minta disembunyikan</strong></td>
+          <td>Alumni sudah meminta namanya ditutup, namun masih tampil.</td>
+          <td>Selesaikan permintaannya di halaman Tinjau.</td>
+        </tr>
+        <tr>
+          <td><strong>Tanpa angkatan</strong> dan <strong>Tersembunyi</strong></td>
+          <td>Angkatan belum terisi, atau nama memang sedang tidak ditampilkan.</td>
+          <td>Angkatan menentukan penyaringan, jadi sebaiknya dilengkapi. Daftar Tersembunyi sesekali ditengok agar tidak ada nama yang tertinggal di sana tanpa sebab.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note"><strong>Baris yang belum lengkap sebaiknya dilengkapi, bukan dihapus.</strong> Penghapusan bersifat tetap dan riwayat jabatan orang itu ikut hilang. Bila sebuah baris masih meragukan, sembunyikan dahulu sambil menunggu kejelasan.</div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">6 / 13</span></footer>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Langkah 3 dari 3</p>
+      <h1>Menambah nama baru</h1>
+      <p class="lede">Ada empat cara memasukkan nama. Semuanya tersimpan dahulu, lalu ditampilkan setelah diperiksa.</p>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <th>Cara</th>
+          <th>Cocok untuk</th>
+          <th>Yang perlu diperhatikan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Tambah satu orang</strong></td>
+          <td>Satu nama dengan data yang sudah cukup lengkap.</td>
+          <td>Isiannya sama dengan formulir ubah data, jadi bisa dirapikan sekaligus.</td>
+        </tr>
+        <tr>
+          <td><strong>Tempel daftar</strong></td>
+          <td>Daftar resmi dari sekretariat, paling banyak 200 baris sekali tempel.</td>
+          <td>Satu orang per baris. Baris yang diawali tanda pagar dilewati. Ada pilihan membuat tautan undangan untuk setiap nama.</td>
+        </tr>
+        <tr>
+          <td><strong>Impor CSV</strong></td>
+          <td>Berkas ekspor Google Form atau template resmi, paling besar 8 MB.</td>
+          <td>Pilihan “Hanya tambah nama baru” sebaiknya tetap tercentang agar data yang sudah rapi tidak tertimpa.</td>
+        </tr>
+        <tr>
+          <td><strong>Pendaftaran mandiri</strong></td>
+          <td>Alumni yang menemukan situs sendiri.</td>
+          <td>Masuk ke blok akun menunggu di halaman Tinjau, bukan langsung ke direktori.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="flow-row">
+      <div class="box"><strong>Nama masuk</strong>Lewat panel atau pendaftaran mandiri.</div>
+      <div class="arr">›</div>
+      <div class="box"><strong>Tersimpan, belum tampil</strong>Menunggu di halaman Tinjau.</div>
+      <div class="arr">›</div>
+      <div class="box"><strong>Ditampilkan</strong>Setelah diperiksa dan dipilih Tampilkan.</div>
+    </div>
+    <article class="card">
+      <h3>Susunan kolom</h3>
+      <p>Tempel daftar memakai pemisah titik koma, sedangkan impor memakai template CSV yang bisa diunduh dari halaman Impor.</p>
+      <code class="cmd">nama; fakultas; angkatan; email; WhatsApp</code>
+      <p class="mt">Email dan WhatsApp boleh dikosongkan. Baris yang pernah diubah alumni sendiri tidak pernah ditimpa impor.</p>
+    </article>
+    <div class="note"><strong>Setelah impor besar,</strong> jalankan <code>python -m alumni_web.cli quality --apply</code> agar penandaan mutu dan nama kembar ikut diperbarui.</div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">7 / 13</span></footer>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Kepengurusan</p>
+      <h1>Jabatan dan bagan struktur</h1>
+      <p class="lede">Bagan Struktur di situs disusun dari catatan jabatan pada masing-masing baris alumni.</p>
+    </header>
+    <ol class="steps">
+      <li><span class="n">1</span><span>Buka <strong>Ubah</strong> pada baris orang yang bersangkutan, lalu turun ke bagian jabatan.</span></li>
+      <li><span class="n">2</span><span>Pilih tahun kepengurusan, misalnya 2023/2024, dan pilih jabatannya. Setiap divisi punya sekbend.</span></li>
+      <li><span class="n">3</span><span>Khusus penanggung jawab fakultas, pilih pula fakultasnya agar catatan dapat disimpan.</span></li>
+      <li><span class="n">4</span><span>Simpan. Bagan Struktur ikut berubah pada tahun yang sama. Kalau susunan tahun itu berbeda, sesuaikan dulu lewat <strong>Bagan</strong> (tab Tahun kepengurusan) dengan menerapkan template, bukan membuat ulang dari nol.</span></li>
+    </ol>
+    <div class="org-mini">
+      <div class="band">
+        <div class="org-seat filled"><strong>Ketua</strong>terisi</div>
+        <div class="org-seat filled"><strong>Sekretaris</strong>terisi</div>
+        <div class="org-seat filled"><strong>Bendahara</strong>terisi</div>
+        <div class="org-seat">Wakil ketua · kosong</div>
+      </div>
+      <div class="band">
+        <div class="org-seat filled"><strong>PJ Pertanian</strong>terisi</div>
+        <div class="org-seat">PJ Teknik · kosong</div>
+        <div class="org-seat filled"><strong>PJ Ekonomi</strong>terisi</div>
+        <div class="org-seat">PJ Hukum · kosong</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <article class="card">
+        <h3>Satu catatan untuk satu tahun</h3>
+        <p>Pengurus yang menjabat tiga tahun memiliki tiga catatan, meski jabatannya sama. Susunan inilah yang membuat bagan tiap tahun dapat ditampilkan terpisah.</p>
+      </article>
+      <article class="card">
+        <h3>Alumni dapat mengisi sendiri</h3>
+        <p>Riwayat jabatan juga bisa ditambahkan alumni dari halaman Profil saya. Sesekali periksa hasilnya, terutama penulisan tahun dan pasangan jabatan dengan fakultasnya.</p>
+      </article>
+    </div>
+    <div class="note"><strong>Kursi yang belum terisi</strong> tetap tampil di bagan sebagai kotak kosong. Menghapus satu catatan jabatan dilakukan lewat tombol Hapus pada baris jabatan itu; yang terhapus hanya catatan jabatannya, bukan datanya.</div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">8 / 13</span></footer>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Kelola akun</p>
+      <h1>Akun pengurus dan akun alumni</h1>
+      <p class="lede">Semua yang berhubungan dengan akses masuk dikerjakan dari halaman Kelola akun.</p>
+    </header>
+    <div class="qa-list">
+      <div class="qa-row">
+        <p class="q">Menambah pengurus baru</p>
+        <p class="a">Pada bagian Pengurus cadangan, isi email dan kata sandi awal minimal 10 karakter, lalu pilih Tambah pengurus. Sampaikan sandi itu langsung kepada orangnya lewat jalur pribadi, dan mintalah segera diganti.</p>
+      </div>
+      <div class="qa-row">
+        <p class="q">Mengapa perlu dua pengurus</p>
+        <p class="a">Agar akses paguyuban tidak terhenti ketika satu orang kehilangan sandi atau berhalangan. Sistem menolak penonaktifan pengurus terakhir, dan seorang pengurus tidak dapat menonaktifkan akunnya sendiri.</p>
+      </div>
+      <div class="qa-row">
+        <p class="q">Kode pemulih</p>
+        <p class="a">Tombol “Buat kode pemulih untuk akun saya” menghasilkan 8 kode sekali pakai yang hanya ditampilkan satu kali. Simpan di tempat aman namun tetap terjangkau; kode inilah jalan masuk ketika sandi pengurus terlupa.</p>
+      </div>
+      <div class="qa-row">
+        <p class="q">Sandi pengurus lain</p>
+        <p class="a">Hanya dapat diganti oleh orangnya sendiri, lewat kode pemulih, atau lewat perintah di server. Pembatasan ini disengaja supaya satu akun yang bocor tidak dapat mengambil alih seluruh kepengurusan.</p>
+      </div>
+      <div class="qa-row">
+        <p class="q">Akun alumni yang bermasalah</p>
+        <p class="a">Pilih Nonaktifkan untuk menutup akses tanpa menghapus data, dan Aktifkan kembali bila persoalannya selesai. Untuk membantu alumni yang terkunci, isikan sandi sementara minimal 10 karakter pada barisnya, lalu sampaikan langsung.</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <article class="card">
+        <h3>Saat pergantian kepengurusan</h3>
+        <p>Buat akun pengurus baru beserta kode pemulihnya lebih dahulu, barulah akun pengurus lama dinonaktifkan. Dengan urutan itu selalu ada dua akses yang hidup.</p>
+      </article>
+      <article class="card">
+        <h3>Pengurus yang selesai menjabat</h3>
+        <p>Akunnya cukup dinonaktifkan. Datanya sebagai alumni tetap utuh di direktori, termasuk riwayat jabatan yang pernah diembannya.</p>
+      </article>
+    </div>
+    <div class="note"><strong>Sandi pengurus pertama</strong> berasal dari berkas <code>.env</code> saat pemasangan. Berkas itu tidak mengubah akun yang sudah ada, jadi penggantian sandi berikutnya lewat halaman ini atau lewat server.</div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">9 / 13</span></footer>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Amanah data</p>
+      <h1>Menjaga data pribadi</h1>
+      <p class="lede">Alumni menitipkan nomor, email, dan alamatnya kepada paguyuban. Kebiasaan kecil berikut yang menjaga titipan itu.</p>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <th>Hal</th>
+          <th>Kebiasaan yang dipakai</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ekspor CSV</strong></td>
+          <td>Diunduh hanya ketika benar-benar diperlukan dan disimpan di perangkat pengurus. Setiap unduhan tercatat, lengkap dengan waktu dan pelakunya.</td>
+        </tr>
+        <tr>
+          <td><strong>Tangkapan layar panel</strong></td>
+          <td>Dipotong pada bagian kontak sebelum dibagikan ke grup, karena satu tangkapan layar dapat memuat puluhan nomor sekaligus.</td>
+        </tr>
+        <tr>
+          <td><strong>Tautan undangan dan pemulihan</strong></td>
+          <td>Dikirim kepada orangnya lewat jalur yang sudah dikenal, biasanya pesan pribadi atau grup paguyuban. Berlaku 14 hari dan sekali pakai.</td>
+        </tr>
+        <tr>
+          <td><strong>Sandi awal dan sandi sementara</strong></td>
+          <td>Disampaikan langsung kepada yang bersangkutan, lalu diminta segera diganti.</td>
+        </tr>
+        <tr>
+          <td><strong>Peta sebaran</strong></td>
+          <td>Ambang 3 alumni per kota dipertahankan apa adanya, supaya sebuah titik tidak menunjuk satu rumah.</td>
+        </tr>
+        <tr>
+          <td><strong>Cadangan basis data</strong></td>
+          <td>Dibuat dengan perintah <code>backup</code>. Menyalin berkas basis data ketika situs sedang berjalan berisiko menghasilkan cadangan yang rusak.</td>
+        </tr>
+        <tr>
+          <td><strong>Berkas sumber</strong></td>
+          <td>CSV asli, basis data, dan berkas <code>.env</code> disimpan di luar repositori kode.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note"><strong>Bila alumni meminta namanya ditutup,</strong> permintaan itu didahulukan. Nama masih tampil sampai permintaannya disetujui, jadi selesaikan pada kesempatan pertama.</div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">10 / 13</span></footer>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Opsional</p>
+      <h1>Perintah di server</h1>
+      <p class="lede">Hanya diperlukan bila Anda yang memegang server. Pekerjaan harian sudah tercukupi lewat panel.</p>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <th>Perintah</th>
+          <th>Kegunaan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>python -m alumni_web.cli setup</code></td>
+          <td>Menyiapkan basis data dan akun pengurus pertama. Dijalankan saat pemasangan dan setiap kali berpindah server.</td>
+        </tr>
+        <tr>
+          <td><code>python -m alumni_web.cli import --csv berkas.csv</code></td>
+          <td>Mengimpor berkas besar dari baris perintah, untuk berkas yang melampaui batas unggah di panel.</td>
+        </tr>
+        <tr>
+          <td><code>python -m alumni_web.cli quality --apply</code></td>
+          <td>Membersihkan isian sampah dan menghitung ulang penandaan mutu. Tanpa <code>--apply</code>, perintah hanya menampilkan rencananya.</td>
+        </tr>
+        <tr>
+          <td><code>python -m alumni_web.cli backup --out cadangan.db</code></td>
+          <td>Membuat cadangan yang aman meski situs sedang melayani pengunjung.</td>
+        </tr>
+        <tr>
+          <td><code>python -m alumni_web.cli reset-admin --email … --password …</code></td>
+          <td>Mengganti sandi pengurus ketika semua orang terkunci dan kode pemulih tidak tersedia.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="grid-2">
+      <article class="card">
+        <h3>Menjalankannya</h3>
+        <p>Semua perintah dijalankan dari folder proyek memakai lingkungan Python proyek. Bila situs dipasang orang lain, mintalah bantuan orang tersebut.</p>
+      </article>
+      <article class="card">
+        <h3>Waktu yang tepat</h3>
+        <p>Cadangan dibuat sebelum impor besar dan sebelum perapian nama kembar, sehingga selalu ada titik kembali bila hasilnya tidak sesuai harapan.</p>
+      </article>
+    </div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">11 / 13</span></footer>
+  </article>
+
+  <article class="page">
+    <header class="page-head">
+      <p class="kicker">Pemulihan</p>
+      <h1>Bila terjadi kekeliruan</h1>
+      <p class="lede">Hampir semua langkah di panel masih bisa diperbaiki. Cari baris yang paling mendekati keadaan Anda.</p>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <th>Yang terjadi</th>
+          <th>Sebabnya</th>
+          <th>Pemulihannya</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Akun sudah disetujui, namun namanya belum tampil di direktori.</td>
+          <td>Yang dipilih adalah Hanya aktifkan akun.</td>
+          <td>Buka Tinjau, cari namanya di blok ketiga, lalu pilih Tampilkan.</td>
+        </tr>
+        <tr>
+          <td>Halaman tautan tertutup sebelum sempat disalin.</td>
+          <td>Halaman itu memang hanya tampil satu kali.</td>
+          <td>Buat tautan baru dari panel tinjau. Tautan sebelumnya tidak akan terpakai.</td>
+        </tr>
+        <tr>
+          <td>Permintaan koreksi nama sudah disetujui, tetapi datanya belum berubah.</td>
+          <td>Persetujuan pada jenis <code>identity</code> hanya menutup permintaan.</td>
+          <td>Buka Ubah pada baris orang tersebut, tulis perbaikannya, lalu simpan.</td>
+        </tr>
+        <tr>
+          <td>Impor menambah baris yang sebenarnya sudah ada.</td>
+          <td>Nama tertulis dengan ejaan berbeda sehingga terbaca sebagai orang lain.</td>
+          <td>Jalankan <code>quality --apply</code>, lalu rapikan lewat chip Nama kembar.</td>
+        </tr>
+        <tr>
+          <td>Sebuah kota belum muncul di peta.</td>
+          <td>Alumni di kota itu belum mencapai 3 orang, atau ejaan kotanya belum dikenali.</td>
+          <td>Perbaiki ejaan lewat chip Kota tidak terpetakan. Ambang 3 alumni dibiarkan apa adanya.</td>
+        </tr>
+        <tr>
+          <td>Baris data terlanjur dihapus.</td>
+          <td>Penghapusan bersifat tetap, termasuk riwayat jabatannya.</td>
+          <td>Pulihkan dari cadangan terakhir, atau masukkan kembali namanya lalu lengkapi datanya.</td>
+        </tr>
+        <tr>
+          <td>Sandi pengurus terlupa dan tidak ada pengurus lain.</td>
+          <td>Tidak ada akun kedua yang dapat menolong.</td>
+          <td>Pakai kode pemulih, atau jalankan <code>reset-admin</code> di server.</td>
+        </tr>
+      </tbody>
+    </table>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">12 / 13</span></footer>
+  </article>
+
+  <article class="page back">
+    <p class="kicker">Ringkasan</p>
+    <h1>Lima hal untuk diingat</h1>
+    <div class="rules">
+      <article class="rule">
+        <span class="n">1</span>
+        <div>
+          <h2>Kenali dahulu, baru setujui</h2>
+          <p>Satu akun aktif dapat melihat kontak seluruh alumni yang tampil. Persetujuan diberikan kepada orang yang dikenali lewat grup paguyuban.</p>
+        </div>
+      </article>
+      <article class="rule">
+        <span class="n">2</span>
+        <div>
+          <h2>Dua tombol persetujuan, dua akibat</h2>
+          <p>Setujui dan tampilkan mengaktifkan akun sekaligus menampilkan nama. Hanya aktifkan akun membuka akses masuk tanpa menampilkan nama.</p>
+        </div>
+      </article>
+      <article class="rule">
+        <span class="n">3</span>
+        <div>
+          <h2>Lengkapi dan sembunyikan, hapus sebagai pilihan terakhir</h2>
+          <p>Baris yang meragukan cukup disembunyikan sambil menunggu kejelasan, sebab penghapusan bersifat tetap.</p>
+        </div>
+      </article>
+      <article class="rule">
+        <span class="n">4</span>
+        <div>
+          <h2>Tautan tampil satu kali, salin saat itu juga</h2>
+          <p>Undangan dan tautan pemulihan berlaku 14 hari dan sekali pakai. Bila terlewat, tautan baru dapat dibuat kapan saja.</p>
+        </div>
+      </article>
+      <article class="rule">
+        <span class="n">5</span>
+        <div>
+          <h2>Dua pengurus dan satu cadangan</h2>
+          <p>Selalu ada pengurus kedua, kode pemulih yang tersimpan, dan cadangan basis data sebelum pekerjaan besar.</p>
+        </div>
+      </article>
+    </div>
+    <div class="cover-foot">
+      <div class="seals seals-sm">
+        <img class="seal-kse" src="../../alumni_web/static/img/kse.png" alt="">
+        <img class="seal-unand" src="../../alumni_web/static/img/unand.png" alt="">
+      </div>
+      <p>Buku ini disiapkan untuk pengurus paguyuban.<br>Versi untuk alumni tertaut di kaki setiap halaman situs.</p>
+    </div>
+    <footer class="running"><span>Buku saku pengurus · <strong>KSE UNAND</strong></span><span class="folio">13 / 13</span></footer>
+  </article>
+
+</body>
+</html>

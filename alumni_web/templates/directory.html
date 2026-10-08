@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% from "_cards.html" import person_card %}
+{% block title %}Direktori · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Direktori alumni</h1>
+  <p>Menampilkan {{ total }} nama. Nomor WhatsApp, email, dan alamat hanya bisa dilihat setelah Anda masuk sebagai anggota.</p>
+</section>
+
+<form class="filters" method="get">
+  <div class="field">
+    <label for="dir-q">Cari</label>
+    <input id="dir-q" name="q" value="{{ request.args.get('q', '') }}" placeholder="Nama, jurusan, kota">
+  </div>
+  <div class="field">
+    <label for="dir-fakultas">Fakultas</label>
+    <select id="dir-fakultas" name="fakultas">
+      <option value="">Semua</option>
+      {% for code, label in faculties.items() %}
+        <option value="{{ code }}" {% if request.args.get('fakultas') == code %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="dir-angkatan">Angkatan</label>
+    <select id="dir-angkatan" name="angkatan">
+      <option value="">Semua</option>
+      {% for y in cohorts %}
+        <option value="{{ y }}" {% if request.args.get('angkatan') == y|string %}selected{% endif %}>{{ y }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="dir-status">Status</label>
+    <select id="dir-status" name="status">
+      <option value="">Semua</option>
+      {% for code, label in status_labels.items() %}
+        <option value="{{ code }}" {% if request.args.get('status') == code %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="dir-jurusan">Jurusan</label>
+    <input id="dir-jurusan" name="jurusan" value="{{ request.args.get('jurusan', '') }}" placeholder="Semua">
+  </div>
+  <div class="field">
+    <label for="dir-kota">Kota</label>
+    <input id="dir-kota" name="kota" value="{{ request.args.get('kota', '') }}" placeholder="Semua">
+  </div>
+  <div class="field">
+    <label for="dir-jabatan">Jabatan KSE</label>
+    <select id="dir-jabatan" name="jabatan">
+      <option value="">Semua</option>
+      {% for group in kse_office_groups %}
+        <optgroup label="{{ group.title }}">
+          {% for office in group.offices %}
+            <option value="{{ office.code }}" {% if request.args.get('jabatan') == office.code %}selected{% endif %}>{{ office.label }}</option>
+          {% endfor %}
+        </optgroup>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="actions">
+    <button class="btn" type="submit">Tampilkan</button>
+    <a class="btn btn-ghost" href="{{ url_for('directory') }}">Atur ulang</a>
+  </div>
+</form>
+
+<div class="yearbook">
+  {% for row in rows %}
+    {{ person_card(row) }}
+  {% else %}
+    <p class="empty">Belum ada nama yang cocok. Coba kurangi salah satu pilihan di atas, atau <a href="{{ url_for('directory') }}">tampilkan semua nama</a>.</p>
+  {% endfor %}
+</div>
+
+{% if pages > 1 %}
+  <nav class="pager" aria-label="Halaman direktori">
+    {% if page > 1 %}<a href="{{ url_for('directory', page=page-1, **query) }}">← Sebelumnya</a>{% endif %}
+    <span>Halaman {{ page }} dari {{ pages }}</span>
+    {% if page < pages %}<a href="{{ url_for('directory', page=page+1, **query) }}">Berikutnya →</a>{% endif %}
+  </nav>
+{% endif %}
+{% endblock %}

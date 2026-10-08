@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Impor CSV · Pengurus{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('admin_home') }}">← Panel pengurus</a></p>
+<section class="auth wide">
+  <h1>Impor CSV</h1>
+  <p>CSV bersifat opsional. Unduh <a href="{{ url_for('admin_import_template') }}">template dengan kolom tetap</a>, atau unggah ekspor Google Form lama. Maksimal 8 MB.</p>
+  <form method="post" enctype="multipart/form-data" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Berkas CSV <input type="file" name="file" accept=".csv" required></label>
+    <label class="check">
+      <input type="checkbox" name="insert_only" value="1" checked>
+      Hanya tambah nama baru; jangan perbarui baris yang sudah ada
+    </label>
+    <button class="btn" type="submit">Impor</button>
+  </form>
+  <p class="fine">Baris yang sudah diubah alumni sendiri tidak pernah ditimpa, meski kotak di atas tidak dicentang.</p>
+  {% if result %}
+    <dl class="facts">
+      <div><dt>Berkas</dt><dd>{{ result.filename }}</dd></div>
+      <div><dt>Baris baru</dt><dd>{{ result.inserted }}</dd></div>
+      <div><dt>Diperbarui</dt><dd>{{ result.updated }}</dd></div>
+      <div><dt>Dilewati</dt><dd>{{ result.skipped }}</dd></div>
+    </dl>
+    <p class="fine">Jalankan <code>python -m alumni_web.cli quality --dedupe</code> setelah impor besar agar bendera mutu ikut diperbarui.</p>
+  {% endif %}
+</section>
+{% endblock %}

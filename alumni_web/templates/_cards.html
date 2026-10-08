@@ -1,0 +1,13 @@
+{% macro person_card(row) %}
+  {%- set meta = [('Angkatan ' ~ row['cohort_year']) if row['cohort_year'] else None, row['city']]|select|join(' · ') -%}
+  <a class="card" href="{{ url_for('profile', alumni_id=row['id']) }}">
+    <span class="mono" aria-hidden="true">{{ row['full_name']|initials }}</span>
+    <span class="card-body">
+      <span class="card-name">{{ row['full_name']|display_name }}</span>
+      <span class="card-line">{{ row['faculty_code']|faculty_name }}{% if row['major_normalized'] %} · {{ row['major_normalized'] }}{% endif %}</span>
+      {% if row['office_label'] %}<span class="card-office">{{ row['office_label'] }}{% if row['office_period'] %} · {{ row['office_period'] }}{% endif %}</span>{% endif %}
+      {% if row['workplace'] %}<span class="card-work">{{ row['workplace'] }}</span>{% endif %}
+      <span class="card-meta {% if not meta %}is-empty{% endif %}">{{ meta or 'Belum terdata' }}</span>
+    </span>
+  </a>
+{% endmacro %}

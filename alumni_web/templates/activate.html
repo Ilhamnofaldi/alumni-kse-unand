@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Ajukan akun · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="auth">
+  {% from "_brand.html" import seal_sm %}
+  {{ seal_sm("kse", "", 74, 58, "auth-crest") }}
+  <h1>Ajukan akun alumni</h1>
+  <p>Gunakan email yang sudah tercatat di direktori. Pengurus memeriksa setiap permintaan sebelum menyetujui. Nama yang belum ada di data memakai <a href="{{ url_for('register_alumni') }}">halaman daftar</a>.</p>
+  <form method="post">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Email <input type="email" name="email" required autocomplete="email"></label>
+    <label>Kata sandi baru <input type="password" name="password" required minlength="8" autocomplete="new-password"></label>
+    <button class="btn" type="submit">Kirim permintaan</button>
+  </form>
+  <p class="fine">Kata sandi minimal 8 karakter. Sudah punya akun aktif? <a href="{{ url_for('login') }}">Masuk di sini</a>.</p>
+</section>
+{% endblock %}

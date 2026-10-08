@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block title %}Struktur · Alumni KSE UNAND{% endblock %}
+
+{# Keterangan orang dirangkai sebagai daftar lalu disambung, supaya tidak ada
+   pemisah "·" yang menggantung ketika angkatan atau fakultas belum terdata.
+   Periode hanya perlu disebut di mode semua periode; di satu tahun, judul
+   bagan sudah menyebut tahunnya. #}
+{% macro org_people(people, scope=True) %}
+  {% if people %}
+    <ul class="org-people">
+      {% for person in people %}
+        {% set meta = [
+             person.scope|faculty_name if scope and person.scope else None,
+             'Angkatan ' ~ person.cohort_year if person.cohort_year else None,
+             format_period(person.period_start, person.period_end)
+               if year is none and person.period_start else None,
+           ]|select('string')|list %}
+        <li>
+          <a href="{{ url_for('profile', alumni_id=person.id) }}">{{ person.full_name|display_name }}</a>
+          {% if meta %}<span>{{ meta|join(' · ') }}</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Belum ada nama.</p>
+  {% endif %}
+{% endmacro %}
+
+{% macro org_node(seat, extra='', heading=None, scope=True) %}
+  <article class="org-node {{ extra }}{% if not seat.people %} is-empty{% endif %}">
+    <h3>{{ heading or seat.label }}</h3>
+    {{ org_people(seat.people, scope) }}
+  </article>
+{% endmacro %}
+
+{% macro org_join(heading_id, title) %}
+  <div class="org-tree-join">
+    <span class="org-tree-join-line" aria-hidden="true"></span>
+    <h2 id="{{ heading_id }}">{{ title }}</h2>
+    <span class="org-tree-join-line" aria-hidden="true"></span>
+  </div>
+{% endmacro %}
+
+{% macro org_pair(seats, extra, down=False, up=False, short=False) %}
+  {% if seats|length == 2 %}
+    <div class="org-pair{% if down %} org-pair-down{% endif %}{% if up %} org-pair-up{% endif %}">
+      {% for seat in seats %}
+        <div class="org-pair-item">{{ org_node(seat, extra, seat.short if short else None) }}</div>
+      {% endfor %}
+    </div>
+  {% elif seats %}
+    <div class="org-pj">
+      {% for seat in seats %}
+        {{ org_node(seat, extra, seat.short if short else None) }}
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{# Kartu koordinator: kicker menyebut jenis kursinya, judul menyebut namanya,
+   sub-blok menyebut perannya. Jangan ulangi nama koordinator di label anggota. #}
+{% macro org_team_card(team, tone) %}
+  <section class="org-unit is-tone-{{ tone }}">
+    <p class="org-unit-kicker">Koordinator</p>
+    <h3>{{ team.coordinator.short }}</h3>
+    {{ org_people(team.coordinator.people) }}
+    <div class="org-unit-members{% if not team.members %} is-empty{% endif %}">
+      <h4>Anggota</h4>
+      {{ org_people(team.members) }}
+    </div>
+  </section>
+{% endmacro %}
+
+{% macro org_unit_members(unit) %}
+  {% if unit.members or not (unit.teams or []) %}
+    <div class="org-unit-members{% if not unit.members %} is-empty{% endif %}">
+      <h4>Anggota</h4>
+      {{ org_people(unit.members) }}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{# Kartu unit: judul menyebut nama unit, tiap sub-blok menyebut jabatannya.
+   Label pimpinan memakai `lead_role` — `short` jabatan pimpinan berisi nama
+   unit, jadi kalau dipakai di sini namanya tertulis dua kali. #}
+{% macro org_division(unit) %}
+  <section class="org-unit is-tone-{{ unit.tone }}">
+    <h3>{{ unit.title }}</h3>
+    {% if unit.lead %}
+      <article class="org-unit-lead{% if not unit.lead.people %} is-empty{% endif %}">
+        <h4>{{ unit.lead_role }}</h4>
+        {{ org_people(unit.lead.people) }}
+      </article>
+    {% endif %}
+    {% for seat in unit.officers %}
+      <article class="org-unit-officer{% if not seat.people %} is-empty{% endif %}">
+        <h4>{{ seat.short }}</h4>
+        {{ org_people(seat.people) }}
+      </article>
+    {% endfor %}
+    {% if unit.teams %}
+      <div class="org-team-row">
+        {% for team in unit.teams %}
+          {{ org_team_card(team, unit.tone) }}
+        {% endfor %}
+      </div>
+    {% endif %}
+    {{ org_unit_members(unit) }}
+  </section>
+{% endmacro %}
+
+{% block content %}
+<section class="page-head">
+  <h1>Struktur kepengurusan</h1>
+  <p>
+    Siapa saja yang mengurus Paguyuban KSE UNAND.
+    {% if chart.period_label %}
+      Bagan ini menampilkan periode {{ chart.period_label }}.
+    {% else %}
+      Semua periode yang tercatat ditampilkan sekaligus.
+    {% endif %}
+  </p>
+  <p class="fine">
+    {{ chart.filled }} jabatan terisi, {{ chart.people }} nama.
+    {% if chart.layout and chart.layout.is_custom %}
+      Susunan bagan mengikuti kepengurusan periode ini, bukan template bawaan.
+    {% endif %}
+  </p>
+</section>
+
+<nav class="org-periods" aria-label="Periode kepengurusan">
+  <a class="chip {% if year is none %}chip-on{% endif %}" href="{{ url_for('org_chart', periode='semua') }}">Semua periode</a>
+  {% for y in years %}
+    <a class="chip {% if year == y %}chip-on{% endif %}" href="{{ url_for('org_chart', periode=y) }}">{{ y }}/{{ y + 1 }}</a>
+  {% endfor %}
+</nav>
+
+{% if current_user and current_user['role'] == 'admin' %}
+  <p class="toolbar">
+    <a class="btn btn-ghost" href="{{ url_for('admin_org', periode=year) if year else url_for('admin_org') }}">Sesuaikan bagan</a>
+  </p>
+{% endif %}
+
+{% set tree = chart.tree %}
+<div class="org-tree-scroll">
+  <div class="org-tree">
+    <section class="org-tree-tier" aria-labelledby="org-inti">
+      {{ org_join('org-inti', 'Pengurus inti') }}
+      {# Palang turun dari ketua dan palang naik ke sekretaris jatuh di garis
+         yang sama, jadi keduanya terbaca sebagai satu palang. Jangan sisipkan
+         batang tegak di antaranya — yang muncul dua garis sejajar. #}
+      {{ org_pair(tree.heads, 'org-node-head', down=tree.officers or tree.core_extra) }}
+      {{ org_pair(tree.officers, 'org-node-officer', up=tree.heads, down=tree.core_extra) }}
+      {% if tree.core_extra %}
+        <div class="org-drop">
+          <div class="org-pj">
+            {% for seat in tree.core_extra %}
+              {{ org_node(seat, 'org-node-officer') }}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </section>
+
+    {% if tree.divisions %}
+      <section class="org-tree-tier" aria-labelledby="org-divisi">
+        {{ org_join('org-divisi', 'Divisi') }}
+        <div class="org-units">
+          {% for unit in tree.divisions %}
+            {{ org_division(unit) }}
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    {# Sayap memakai judul tingkat sebagai nama unit, jadi simpulnya cukup
+       menyebut jabatan: "Ketua", "Sekbend", "MnB". #}
+    {% for wing in tree.wings %}
+      <section class="org-tree-tier" aria-labelledby="org-wing-{{ wing.code }}">
+        {{ org_join('org-wing-' ~ wing.code, wing.title) }}
+        {% if wing.lead %}
+          {{ org_node(wing.lead, 'org-node-head', wing.lead_role) }}
+        {% endif %}
+        {% if wing.officers %}
+          <div class="org-tree-stem" aria-hidden="true"></div>
+          {{ org_pair(wing.officers, 'org-node-officer', up=True, down=True, short=True) }}
+        {% endif %}
+        {% if wing.teams %}
+          <div class="org-drop">
+            <div class="org-units">
+              {% for team in wing.teams %}
+                {{ org_team_card(team, wing.tone) }}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+        {% if wing.members or not wing.teams %}
+          <div class="org-drop">
+            <section class="org-unit is-tone-{{ wing.tone }} org-unit-span{% if not wing.members %} is-empty{% endif %}">
+              <h3>Anggota</h3>
+              {{ org_people(wing.members) }}
+            </section>
+          </div>
+        {% endif %}
+      </section>
+    {% endfor %}
+
+    {% if tree.unspecified %}
+      <section class="org-tree-tier org-unspecified" aria-labelledby="org-unspecified">
+        {{ org_join('org-unspecified', tree.unspecified.label) }}
+        <p class="fine">Catatan lama tanpa nama divisi. Tetap tampil di sini sampai diperbarui menjadi anggota divisi yang spesifik.</p>
+        <article class="org-node org-node-wide">
+          {{ org_people(tree.unspecified.people) }}
+        </article>
+      </section>
+    {% endif %}
+
+    {% if tree.outside %}
+      <section class="org-tree-tier org-unspecified" aria-labelledby="org-outside">
+        {{ org_join('org-outside', 'Jabatan di luar bagan ini') }}
+        <p class="fine">Nama ini tercatat dengan jabatan yang tidak ada di susunan periode ini. Pengurus bisa menambah jabatannya ke bagan, atau memindahkan catatannya.</p>
+        <div class="org-pj">
+          {% for seat in tree.outside %}
+            {{ org_node(seat, 'org-node-pj') }}
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    <section class="org-tree-tier" aria-labelledby="org-pj">
+      {{ org_join('org-pj', 'Penanggung jawab') }}
+      <div class="org-pj">
+        {{ org_node(tree.pj_universitas, 'org-node-pj', tree.pj_universitas.short) }}
+        {# Fakultas sudah jadi judul kartu, jadi tidak diulang di tiap nama. #}
+        {% if tree.pj_faculty_groups %}
+          {% for group in tree.pj_faculty_groups %}
+            <article class="org-node org-node-pj">
+              <h3>PJ Fakultas {{ group.label }}</h3>
+              {{ org_people(group.people, scope=False) }}
+            </article>
+          {% endfor %}
+        {% else %}
+          <article class="org-node org-node-pj is-empty">
+            <h3>{{ tree.pj_fakultas.short or tree.pj_fakultas.label }}</h3>
+            {{ org_people(tree.pj_fakultas.people) }}
+          </article>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

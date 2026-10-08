@@ -1,0 +1,20 @@
+{# Lambang: unduh ukuran yang mendekati tampilan, bukan PNG 640px di setiap halaman. #}
+{% macro seal(kind, alt, width, height, class_name='', lazy=false) -%}
+{%- set sm = 'img/' ~ kind ~ '-sm.png' -%}
+{%- set md = 'img/' ~ kind ~ '-md.png' -%}
+<img{% if class_name %} class="{{ class_name }}"{% endif %}
+    src="{{ url_for('static', filename=md) }}"
+    srcset="{{ url_for('static', filename=sm) }} 128w, {{ url_for('static', filename=md) }} 256w"
+    sizes="{{ width }}px"
+    width="{{ width }}" height="{{ height }}"
+    {%- if lazy %} loading="lazy" decoding="async"{% endif %}
+    alt="{{ alt }}">
+{%- endmacro %}
+
+{% macro seal_sm(kind, alt, width, height, class_name='', lazy=false) -%}
+<img{% if class_name %} class="{{ class_name }}"{% endif %}
+    src="{{ url_for('static', filename='img/' ~ kind ~ '-sm.png') }}"
+    width="{{ width }}" height="{{ height }}"
+    {%- if lazy %} loading="lazy" decoding="async"{% endif %}
+    alt="{{ alt }}">
+{%- endmacro %}

@@ -1,0 +1,331 @@
+{% macro keep() %}
+  {% if view.year %}<input type="hidden" name="periode" value="{{ view.year }}">{% endif %}
+  {% if view.mode == 'template' and blueprint and blueprint.slug %}
+    <input type="hidden" name="acuan" value="{{ blueprint.slug }}">
+  {% endif %}
+{% endmacro %}
+
+{% macro shift_buttons(action, prev, next, prev_label, next_label) %}
+  {% if view.editable and (prev or next) %}
+    <div class="toolbar">
+      {% if prev %}
+        <form method="post" action="{{ action }}">
+          <input type="hidden" name="csrf" value="{{ csrf_token }}">
+          {{ keep() }}
+          <input type="hidden" name="arah" value="up">
+          <button class="linkish" type="submit">{{ prev_label }}</button>
+        </form>
+      {% endif %}
+      {% if next %}
+        <form method="post" action="{{ action }}">
+          <input type="hidden" name="csrf" value="{{ csrf_token }}">
+          {{ keep() }}
+          <input type="hidden" name="arah" value="down">
+          <button class="linkish" type="submit">{{ next_label }}</button>
+        </form>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro seat_row(seat) %}
+  <div class="seat-main">
+    <div class="seat-id">
+      <strong>{{ seat.label }}</strong>
+      <span class="fine">Di bagan tertulis “{{ seat.short }}” · {{ seat_kinds.get(seat.seat_kind, seat.seat_kind) }}</span>
+    </div>
+    {% if view.editable %}
+      <div class="toolbar">
+        {% if seat.can_shift_prev %}
+          <form method="post" action="{{ url_for('admin_org_move_seat', seat_id=seat.id) }}">
+            <input type="hidden" name="csrf" value="{{ csrf_token }}">
+            {{ keep() }}
+            <input type="hidden" name="arah" value="up">
+            <button class="linkish" type="submit">{{ seat.shift_prev_label }}</button>
+          </form>
+        {% endif %}
+        {% if seat.can_shift_next %}
+          <form method="post" action="{{ url_for('admin_org_move_seat', seat_id=seat.id) }}">
+            <input type="hidden" name="csrf" value="{{ csrf_token }}">
+            {{ keep() }}
+            <input type="hidden" name="arah" value="down">
+            <button class="linkish" type="submit">{{ seat.shift_next_label }}</button>
+          </form>
+        {% endif %}
+        {% if seat.office_code not in protected_offices %}
+          <form method="post" action="{{ url_for('admin_org_delete_seat', seat_id=seat.id) }}" data-confirm="{% if seat.seat_kind == 'coordinator' %}Lepas koordinator ini? Anggotanya jadi anggota unit, tidak ikut terhapus.{% else %}Lepas jabatan ini dari bagan? Catatan jabatan orang tidak terhapus.{% endif %}">
+            <input type="hidden" name="csrf" value="{{ csrf_token }}">
+            {{ keep() }}
+            <button class="linkish danger" type="submit">Lepas dari bagan</button>
+          </form>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+  {% if view.editable %}
+    <details class="disclose" id="seat-label-{{ seat.id }}">
+      <summary>Ubah tulisannya</summary>
+      <form method="post" action="{{ url_for('admin_org_update_seat', seat_id=seat.id) }}" class="stack">
+        <input type="hidden" name="csrf" value="{{ csrf_token }}">
+        {{ keep() }}
+        <div class="split">
+          <label>Nama jabatan
+            <input name="label" value="{{ seat.label }}" required>
+          </label>
+          <label>Tulisan singkat di bagan
+            <input name="short" value="{{ seat.short }}" required>
+          </label>
+        </div>
+        <button class="btn btn-ghost" type="submit">Simpan nama jabatan</button>
+      </form>
+    </details>
+  {% endif %}
+{% endmacro %}
+
+{% macro place_fields(unit, infer=false) %}
+  {% if unit.unit_kind == 'core' %}
+    <label>Tempat di bagan
+      <select name="place">
+        {% if infer %}<option value="" selected>Ikuti jenis jabatan yang sudah dikenal</option>{% endif %}
+        <option value="officer" {% if not infer %}selected{% endif %}>Pengurus inti — sekretaris, bendahara, atau yang setara</option>
+        <option value="head">Ketua atau wakil ketua</option>
+      </select>
+    </label>
+  {% elif unit.unit_kind == 'pj' %}
+    <label>Tempat di bagan
+      <select name="place">
+        <option value="pj" selected>Penanggung jawab</option>
+      </select>
+    </label>
+  {% else %}
+    <p class="layout-place-legend">Susunan di bagan, dari atas ke bawah:</p>
+    <ol class="layout-place-map">
+      <li>Pimpinan</li>
+      <li>Pengurus (Sekbend, MnB)</li>
+      <li>Koordinator — tiap orang jadi kartu sendiri, dengan anggotanya di bawah</li>
+      <li>Anggota unit — yang tidak terikat koordinator mana pun</li>
+    </ol>
+    <label>Tempat di bagan
+      <select name="place">
+        {% if infer %}<option value="" selected>Ikuti jenis jabatan yang sudah dikenal</option>{% endif %}
+        <option value="lead">Pimpinan — puncak kartu</option>
+        <option value="officer" {% if not infer %}selected{% endif %}>Pengurus — di bawah pimpinan</option>
+        <option value="coordinator">Koordinator baru — kartu sendiri di bawah pengurus</option>
+        <option value="member">Anggota unit — tidak terikat koordinator</option>
+        {% for coord in unit.coordinator_options or [] %}
+          <option value="member:{{ coord.id }}">Anggota di bawah {{ coord.short or coord.label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <p class="fine">Pilih satu cabang. Koordinator baru otomatis mendapat daftar anggota kosong di bawahnya.</p>
+  {% endif %}
+{% endmacro %}
+
+{% if blueprint %}
+  <div class="layout-editor" data-org-editor>
+  <p class="fine layout-tree-note">
+    Bagan yang dilihat alumni selalu berurut: pengurus inti di puncak, lalu divisi, lalu sayap, lalu penanggung jawab.
+    Tombol geser hanya muncul jika posisinya di bagan itu benar-benar berubah.
+  </p>
+  <div class="layout-bands">
+    {% for band in blueprint.unit_bands %}
+      <section class="layout-band">
+        <header class="layout-band-head">
+          <h2>{{ band.title }}</h2>
+          <p class="fine">{{ band.note }}</p>
+        </header>
+        <div class="layout-units">
+          {% for unit in band.units %}
+            <article class="layout-unit{% if not unit.is_visible %} is-hidden{% endif %}" id="unit-{{ unit.id }}">
+              <header class="layout-unit-head">
+                <div>
+                  <p class="org-unit-kicker">{{ unit_kinds.get(unit.unit_kind, unit.unit_kind) }}</p>
+                  <h3>{{ unit.title }}</h3>
+                  {% if unit.lead_role %}<p class="fine">Pimpinannya disebut “{{ unit.lead_role }}”.</p>{% endif %}
+                  {% if not unit.is_visible %}<p class="fine">Disembunyikan dari bagan publik.</p>{% endif %}
+                </div>
+                {{ shift_buttons(
+                  url_for('admin_org_move_unit', unit_id=unit.id),
+                  unit.can_shift_prev,
+                  unit.can_shift_next,
+                  unit.shift_prev_label,
+                  unit.shift_next_label
+                ) }}
+              </header>
+
+              <h4>Jabatan di unit ini</h4>
+              {% set tree = unit.seat_tree or {} %}
+              {% if tree.heads or tree.leads or tree.officers or tree.teams or tree.unit_members or tree.pjs %}
+                {% if tree.heads %}
+                  <p class="layout-seat-group-label">Ketua atau wakil</p>
+                  <ul class="layout-seats">
+                    {% for seat in tree.heads %}<li id="seat-{{ seat.id }}">{{ seat_row(seat) }}</li>{% endfor %}
+                  </ul>
+                {% endif %}
+                {% if tree.leads %}
+                  <p class="layout-seat-group-label">Pimpinan unit</p>
+                  <ul class="layout-seats">
+                    {% for seat in tree.leads %}<li id="seat-{{ seat.id }}">{{ seat_row(seat) }}</li>{% endfor %}
+                  </ul>
+                {% endif %}
+                {% if tree.officers %}
+                  <p class="layout-seat-group-label">Pengurus</p>
+                  <ul class="layout-seats">
+                    {% for seat in tree.officers %}<li id="seat-{{ seat.id }}">{{ seat_row(seat) }}</li>{% endfor %}
+                  </ul>
+                {% endif %}
+                {% for team in tree.teams or [] %}
+                  <div class="layout-seat-group">
+                    <p class="layout-seat-group-label">Koordinator</p>
+                    <ul class="layout-seats">
+                      <li id="seat-{{ team.coordinator.id }}">
+                        {{ seat_row(team.coordinator) }}
+                        {% if team.members %}
+                          <ul class="layout-seat-children">
+                            {% for child in team.members %}
+                              <li id="seat-{{ child.id }}">{{ seat_row(child) }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% endif %}
+                      </li>
+                    </ul>
+                  </div>
+                {% endfor %}
+                {% if tree.unit_members %}
+                  <p class="layout-seat-group-label">Anggota unit</p>
+                  <ul class="layout-seats">
+                    {% for seat in tree.unit_members %}<li id="seat-{{ seat.id }}">{{ seat_row(seat) }}</li>{% endfor %}
+                  </ul>
+                {% endif %}
+                {% if tree.pjs %}
+                  <p class="layout-seat-group-label">Penanggung jawab</p>
+                  <ul class="layout-seats">
+                    {% for seat in tree.pjs %}<li id="seat-{{ seat.id }}">{{ seat_row(seat) }}</li>{% endfor %}
+                  </ul>
+                {% endif %}
+              {% else %}
+                <ul class="layout-seats">
+                  {% for seat in unit.seats %}
+                    <li id="seat-{{ seat.id }}">{{ seat_row(seat) }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+
+              {% if view.editable %}
+                <details class="disclose" id="add-seat-{{ unit.id }}">
+                  <summary>Tambah jabatan ke {{ unit.title }}</summary>
+                  <p class="fine">Ada dua cara. Pilih salah satu, tidak perlu keduanya.</p>
+                  <div class="choice-pair">
+                    <section class="choice">
+                      <h5>Cara 1 — pakai jabatan yang sudah dikenal</h5>
+                      {% if unused.get(unit.id) %}
+                        <p class="fine">Paling aman. Jabatan ini sudah ada di daftar sistem, jadi riwayat jabatan alumni langsung menempel ke bagan.</p>
+                        <form method="post" action="{{ url_for('admin_org_add_seat') }}" class="stack">
+                          <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                          {{ keep() }}
+                          <input type="hidden" name="unit_id" value="{{ unit.id }}">
+                          <label>Pilih jabatan
+                            <select name="office_code" required>
+                              {% for office in unused.get(unit.id, []) %}
+                                <option value="{{ office.code }}">{{ office.label }}</option>
+                              {% endfor %}
+                            </select>
+                          </label>
+                          {{ place_fields(unit, infer=true) }}
+                          <button class="btn" type="submit">Tambahkan jabatan ini</button>
+                        </form>
+                      {% else %}
+                        <p class="fine">Semua jabatan yang dikenal sistem sudah ada di unit ini. Pakai cara 2 kalau butuh jabatan baru.</p>
+                      {% endif %}
+                    </section>
+
+                    <section class="choice">
+                      <h5>Cara 2 — buat jabatan yang belum ada</h5>
+                      <p class="fine">Pakai ini kalau namanya tidak ada di cara 1, misalnya “Manager and Business”. Jabatan baru ikut masuk daftar sistem, jadi tahun depan bisa dipilih lewat cara 1.</p>
+                      <form method="post" action="{{ url_for('admin_org_add_seat') }}" class="stack">
+                        <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                        {{ keep() }}
+                        <input type="hidden" name="unit_id" value="{{ unit.id }}">
+                        <label>Nama jabatan
+                          <input name="label" required placeholder="Manager and Business">
+                        </label>
+                        <label>Tulisan singkat di bagan
+                          <input name="short" placeholder="MnB">
+                        </label>
+                        {{ place_fields(unit) }}
+                        <button class="btn" type="submit">Buat lalu tambahkan</button>
+                      </form>
+                    </section>
+                  </div>
+                </details>
+
+                {% if unit.unit_kind in ('division', 'wing') %}
+                  <details class="disclose" id="unit-set-{{ unit.id }}">
+                    <summary>Pengaturan {{ unit.title }}</summary>
+                    <form method="post" action="{{ url_for('admin_org_update_unit', unit_id=unit.id) }}" class="stack">
+                      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                      {{ keep() }}
+                      <div class="split">
+                        <label>Nama unit
+                          <input name="title" value="{{ unit.title }}" required>
+                        </label>
+                        <label>Sebutan pimpinannya
+                          <input name="lead_role" value="{{ unit.lead_role or '' }}" placeholder="Koordinator">
+                        </label>
+                        <label>Bentuk di bagan
+                          <select name="unit_kind">
+                            <option value="division" {% if unit.unit_kind == 'division' %}selected{% endif %}>Divisi biasa, sebaris dengan divisi lain</option>
+                            <option value="wing" {% if unit.unit_kind == 'wing' %}selected{% endif %}>Berdiri sendiri di samping bagan</option>
+                          </select>
+                        </label>
+                        <label>Tampilan
+                          <select name="is_visible">
+                            <option value="1" {% if unit.is_visible %}selected{% endif %}>Tampil di bagan publik</option>
+                            <option value="0" {% if not unit.is_visible %}selected{% endif %}>Sembunyikan dari bagan publik</option>
+                          </select>
+                        </label>
+                      </div>
+                      <button class="btn btn-ghost" type="submit">Simpan pengaturan unit</button>
+                    </form>
+                    <form method="post" action="{{ url_for('admin_org_delete_unit', unit_id=unit.id) }}" data-confirm="Hapus unit ini dari bagan? Catatan jabatan orang tidak terhapus.">
+                      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                      {{ keep() }}
+                      <button class="linkish danger" type="submit">Hapus unit dari bagan ini</button>
+                    </form>
+                  </details>
+                {% endif %}
+              {% endif %}
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+
+  {% if view.editable %}
+    <details class="disclose disclose-wide">
+      <summary>Tambah divisi atau unit baru</summary>
+      <p class="fine">Unit baru langsung mendapat koordinator, sekbend, dan anggota — pola yang sama dengan template bawaan, supaya tidak perlu disusun ulang dari nol.</p>
+      <form method="post" action="{{ url_for('admin_org_add_unit') }}" class="stack">
+        <input type="hidden" name="csrf" value="{{ csrf_token }}">
+        {{ keep() }}
+        <div class="split">
+          <label>Nama unit
+            <input name="title" required placeholder="Riset">
+          </label>
+          <label>Bentuk di bagan
+            <select name="unit_kind">
+              <option value="division">Divisi biasa, sebaris dengan divisi lain</option>
+              <option value="wing">Berdiri sendiri di samping bagan</option>
+            </select>
+          </label>
+          <label>Sebutan pimpinannya
+            <input name="lead_role" placeholder="Koordinator">
+          </label>
+        </div>
+        <button class="btn" type="submit">Tambah unit</button>
+      </form>
+    </details>
+  {% endif %}
+  </div>
+{% endif %}

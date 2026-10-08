@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Kelola akun · Pengurus{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('admin_home') }}">← Panel pengurus</a></p>
+<section class="page-head">
+  <h1>Kelola akun</h1>
+  <p>Setujui permintaan aktivasi di <a href="{{ url_for('admin_review') }}">halaman tinjau</a> bila ingin sekaligus menampilkan nama. Di sini: kelola akun, sandi sementara, dan pengurus cadangan.</p>
+  <p class="fine">Permintaan hanya membuktikan bahwa pemohon mengetahui email yang ada di data, bukan bahwa ia pemilik email tersebut. Pastikan lewat jalur lain, misalnya grup WhatsApp paguyuban, sebelum menyetujui — satu akun aktif dapat melihat kontak seluruh alumni.</p>
+</section>
+
+<section class="auth wide">
+  <h2>Pengurus cadangan</h2>
+  <p>Minimal dua pengurus. Sandi di <code>.env</code> tidak mengubah akun yang sudah ada.</p>
+  <form method="post" action="{{ url_for('admin_create_pengurus') }}" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <div class="split">
+      <label>Email <input type="email" name="email" required autocomplete="off"></label>
+      <label>Kata sandi awal <input type="password" name="password" required minlength="10" autocomplete="new-password"></label>
+    </div>
+    <button class="btn" type="submit">Tambah pengurus</button>
+  </form>
+  <form method="post" action="{{ url_for('admin_recovery_codes') }}">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <button class="btn btn-ghost" type="submit">Buat kode pemulih untuk akun saya</button>
+  </form>
+</section>
+
+<div class="table-wrap">
+  <table class="grid">
+    <thead>
+      <tr>
+        <th scope="col">Email</th>
+        <th scope="col">Nama</th>
+        <th scope="col">Peran</th>
+        <th scope="col">Status</th>
+        <th scope="col">Diminta</th>
+        <th scope="col"><span class="sr">Aksi</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          <td>{{ row['email'] }}</td>
+          <td>{{ row['full_name'] or '—' }}</td>
+          <td>{{ row['role'] }}</td>
+          <td><span class="pill">{{ row['status'] }}</span></td>
+          <td class="fine">
+            {{ (row['created_at'] or '')[:16]|replace('T', ' ') }}
+            {%- if row['request_ip'] %}<br>IP {{ row['request_ip'] }}{% endif %}
+          </td>
+          <td class="row-actions">
+            {% if row['role'] != 'admin' %}
+              {% if row['status'] == 'pending' %}
+                <form method="post" action="{{ url_for('admin_account_action', user_id=row['id'], action='setujui') }}">
+                  <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                  <button class="linkish" type="submit">Setujui</button>
+                </form>
+                <form method="post" action="{{ url_for('admin_account_action', user_id=row['id'], action='tolak') }}">
+                  <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                  <button class="linkish danger" type="submit">Tolak</button>
+                </form>
+              {% elif row['status'] == 'active' %}
+                <form method="post" action="{{ url_for('admin_account_action', user_id=row['id'], action='nonaktif') }}">
+                  <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                  <button class="linkish danger" type="submit">Nonaktifkan</button>
+                </form>
+              {% elif row['status'] == 'disabled' %}
+                <form method="post" action="{{ url_for('admin_account_action', user_id=row['id'], action='setujui') }}">
+                  <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                  <button class="linkish" type="submit">Aktifkan kembali</button>
+                </form>
+              {% endif %}
+              <form method="post" action="{{ url_for('admin_set_password', user_id=row['id']) }}">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <label class="sr" for="pwd-{{ row['id'] }}">Sandi sementara</label>
+                <input id="pwd-{{ row['id'] }}" name="password" type="password" minlength="10" required placeholder="Sandi sementara" autocomplete="new-password">
+                <button class="linkish" type="submit">Setel sandi</button>
+              </form>
+            {% else %}
+              {% if row['id'] != current_user['id'] and row['status'] == 'active' %}
+                <form method="post" action="{{ url_for('admin_disable_pengurus', user_id=row['id']) }}" data-confirm="Nonaktifkan pengurus ini?">
+                  <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                  <button class="linkish danger" type="submit">Nonaktifkan</button>
+                </form>
+              {% else %}
+                <span class="muted">Anda</span>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6"><span class="muted">Belum ada akun.</span></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

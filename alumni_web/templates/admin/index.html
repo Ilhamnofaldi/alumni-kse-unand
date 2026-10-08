@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Panel pengurus · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Panel pengurus</h1>
+  <p>{{ counts['total'] }} baris data. {{ counts['perlu'] or 0 }} perlu dilengkapi (angkatan atau kota), {{ counts['dups'] or 0 }} nama kembar, {{ counts['tersembunyi'] or 0 }} disembunyikan dari direktori. Tempat kerja kosong tidak ditandai — dahulukan kota dan jabatan KSE.</p>
+  <p class="fine"><a href="{{ url_for('change_password') }}">Ganti kata sandi</a></p>
+</section>
+
+<div class="admin-tools">
+  <p class="toolbar">
+    <a class="btn btn-ghost" href="{{ url_for('admin_new') }}">Tambah satu orang</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin_batch') }}">Tempel daftar</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin_import') }}">Impor CSV</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin_export') }}">Ekspor CSV</a>
+  </p>
+  <p class="toolbar">
+    <a class="btn btn-ghost" href="{{ url_for('admin_org') }}">Bagan</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin_accounts') }}">Kelola akun{% if pending %} ({{ pending }} menunggu){% endif %}</a>
+    <a class="btn btn-ghost" href="{{ url_for('static', filename='docs/pedoman-pengurus.pdf') }}">Buku saku pengurus</a>
+  </p>
+</div>
+
+<hr>
+
+<nav class="queue" aria-label="Antrean perbaikan data">
+  <a class="chip {% if not mutu %}chip-on{% endif %}" href="{{ url_for('admin_home') }}">Semua <span class="count">{{ counts['total'] }}</span></a>
+  {% for key, meta in quality_filters.items() %}
+    {% if queue[key] %}
+      <a class="chip {% if mutu == key %}chip-on{% endif %}" href="{{ url_for('admin_home', mutu=key) }}">{{ meta[0] }} <span class="count">{{ queue[key] }}</span></a>
+    {% endif %}
+  {% endfor %}
+</nav>
+
+<form class="filters" method="get">
+  {% if mutu %}<input type="hidden" name="mutu" value="{{ mutu }}">{% endif %}
+  <div class="field">
+    <label for="adm-q">Pencarian</label>
+    <input id="adm-q" name="q" value="{{ request.args.get('q', '') }}" placeholder="Nama, kerja, kota">
+  </div>
+  <div class="field">
+    <label for="adm-fakultas">Fakultas</label>
+    <select id="adm-fakultas" name="fakultas">
+      <option value="">Semua</option>
+      {% for code, label in faculties.items() %}
+        <option value="{{ code }}" {% if request.args.get('fakultas') == code %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="actions">
+    <button class="btn" type="submit">Terapkan</button>
+    <a class="btn btn-ghost" href="{{ url_for('admin_home', mutu=mutu) if mutu else url_for('admin_home') }}">Reset</a>
+  </div>
+</form>
+
+<p class="fine">Urutan: yang terakhir diubah.</p>
+
+<div class="table-wrap">
+  <table class="grid">
+    <thead>
+      <tr>
+        <th scope="col">Nama</th>
+        <th scope="col">Angkatan</th>
+        <th scope="col">Fakultas</th>
+        <th scope="col">Kota</th>
+        <th scope="col">Catatan mutu</th>
+        <th scope="col"><span class="sr">Aksi</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          <td>
+            <a href="{{ url_for('profile', alumni_id=row['id']) }}">{{ row['full_name'] }}</a>
+            {% if row['is_duplicate_suspect'] %}<span class="pill">kembar</span>{% endif %}
+            {% if not row['is_listed'] %}<span class="pill">tersembunyi</span>{% endif %}
+          </td>
+          <td>{{ row['cohort_year'] or '—' }}</td>
+          <td>{{ row['faculty_code']|faculty_name }}</td>
+          <td>{{ row['city'] or '—' }}</td>
+          <td>
+            {% set notes = row|quality_notes %}
+            {% if notes %}
+              <ul class="notes">
+                {% for note in notes %}<li>{{ note }}</li>{% endfor %}
+              </ul>
+            {% else %}
+              <span class="muted">tidak ada catatan</span>
+            {% endif %}
+          </td>
+          <td class="row-actions">
+            <a href="{{ url_for('admin_edit', alumni_id=row['id']) }}">Ubah</a>
+            <form method="post" action="{{ url_for('admin_delete', alumni_id=row['id']) }}" data-confirm="Hapus data {{ row['full_name'] }}? Tindakan ini tidak bisa dibatalkan.">
+              <input type="hidden" name="csrf" value="{{ csrf_token }}">
+              <button type="submit" class="linkish danger">Hapus</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6"><span class="muted">Tidak ada data pada saringan ini.</span></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if pages > 1 %}
+  <nav class="pager" aria-label="Halaman data">
+    {% if page > 1 %}<a href="{{ url_for('admin_home', page=page-1, **query) }}">← Sebelumnya</a>{% endif %}
+    <span>Halaman {{ page }} dari {{ pages }} · {{ total_rows }} baris</span>
+    {% if page < pages %}<a href="{{ url_for('admin_home', page=page+1, **query) }}">Berikutnya →</a>{% endif %}
+  </nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% from "_cards.html" import person_card %}
+{% from "_brand.html" import seal %}
+{% block title %}Beranda · Direktori Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Sharing · Network · Developing</p>
+    <h1>
+      Direktori Alumni Penerima Beasiswa Karya Salemba Empat
+      <span class="hero-place">Universitas Andalas</span>
+    </h1>
+    <p class="lede">
+      Cari teman, kakak, atau adik tingkat penerima beasiswa KSE di Unand.
+      Ada {{ stats['total'] or 0 }} nama tercatat{% if stats['cohort_min'] and stats['cohort_max'] %}, angkatan {{ stats['cohort_min'] }} sampai {{ stats['cohort_max'] }}{% endif %}.
+    </p>
+    <form class="hero-search" action="{{ url_for('directory') }}" method="get" role="search">
+      <label class="sr" for="q">Cari alumni</label>
+      <input id="q" name="q" placeholder="Cari nama, jurusan, kota, atau tempat kerja">
+      <button class="btn" type="submit">Cari</button>
+    </form>
+    <p class="fine">Belum tahu mau mencari siapa? <a href="{{ url_for('directory') }}">Buka daftar lengkapnya</a>.</p>
+  </div>
+  <div class="crest">
+    <div class="crest-pair">
+      {{ seal("kse", "Lambang Paguyuban Karya Salemba Empat Universitas Andalas", 104, 104, "seal-kse") }}
+      <span class="crest-divider" aria-hidden="true"></span>
+      {{ seal("unand", "Lambang Universitas Andalas", 112, 112, "seal-unand") }}
+    </div>
+    <p class="crest-motto">Untuk Kedjajaan Bangsa</p>
+  </div>
+</section>
+
+<p class="metrics-caption">Isi direktori saat ini</p>
+<section class="metrics" aria-label="Ringkasan isi direktori">
+  <article><strong>{{ stats['total'] or 0 }}</strong><span>Nama tercatat</span></article>
+  <article><strong>{{ stats['faculties'] or 0 }}</strong><span>Fakultas</span></article>
+  <article><strong>{{ stats['cities'] or 0 }}</strong><span>Kota</span></article>
+  <article>
+    <strong>
+      {% if stats['cohort_min'] and stats['cohort_max'] %}{{ stats['cohort_min'] }}–{{ stats['cohort_max'] }}{% else %}—{% endif %}
+    </strong>
+    <span>Rentang angkatan</span>
+  </article>
+</section>
+
+{% if by_faculty %}
+<section class="home-section">
+  <header class="section-head">
+    <h2>Telusuri menurut fakultas</h2>
+    <a href="{{ url_for('directory') }}">Buka direktori</a>
+  </header>
+  <p class="section-note">Pilih satu fakultas untuk melihat siapa saja alumni KSE dari sana.</p>
+  <ol class="folio-list">
+    {% for row in by_faculty %}
+      <li>
+        <a href="{{ url_for('directory', fakultas=row['faculty_code']) }}">{{ row['faculty_code']|faculty_name }}</a>
+        <span>{{ row['n'] }}</span>
+      </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+<section class="home-section">
+  <header class="section-head">
+    <h2>Angkatan terbaru</h2>
+    {% if latest_cohort %}
+      <a href="{{ url_for('directory', angkatan=latest_cohort) }}">Lihat semua angkatan {{ latest_cohort }}</a>
+    {% else %}
+      <a href="{{ url_for('directory') }}">Buka direktori</a>
+    {% endif %}
+  </header>
+  {% if latest_cohort %}
+    <p class="section-note">Angkatan {{ latest_cohort }}, {{ latest_cohort_total }} nama. Klik namanya untuk membuka profil.</p>
+  {% endif %}
+  <div class="yearbook">
+    {% for row in spotlight %}
+      {{ person_card(row) }}
+    {% else %}
+      <p class="empty">Direktori masih kosong. Pengurus perlu mengimpor data alumni terlebih dahulu.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="home-section">
+  <header class="section-head">
+    <h2>Cara lain menelusuri</h2>
+  </header>
+  <nav class="explore" aria-label="Halaman lain">
+    <a href="{{ url_for('map_page') }}">
+      <strong>Sebaran</strong>
+      <span>Peta kota tempat alumni tinggal sekarang. Yang ditandai kotanya, bukan alamat rumah.</span>
+    </a>
+    <a href="{{ url_for('stats_page') }}">
+      <strong>Statistik</strong>
+      <span>Gambaran angka: dari fakultas mana, angkatan berapa, dan sekarang bekerja di mana.</span>
+    </a>
+    <a href="{{ url_for('org_chart') }}">
+      <strong>Struktur</strong>
+      <span>
+        {% if officers %}Bagan kepengurusan paguyuban, dari ketua sampai anggota divisi.{% else %}Bagan kepengurusan paguyuban. Datanya masih dikumpulkan pengurus.{% endif %}
+      </span>
+    </a>
+  </nav>
+</section>
+
+{% if quotes %}
+<section class="home-section">
+  <header class="section-head">
+    <h2>Kesan dan pesan</h2>
+  </header>
+  <p class="section-note">Ditulis sendiri oleh alumni waktu mengisi data. Terima kasih sudah berbagi.</p>
+  <div class="carousel" data-carousel role="region" aria-roledescription="carousel" aria-label="Kesan dan pesan alumni">
+    <ul class="carousel-track">
+      {% for item in quotes %}
+        <li class="carousel-slide" aria-roledescription="slide" aria-label="Kutipan {{ loop.index }} dari {{ quotes|length }}">
+          <blockquote class="quote">
+            <p>{{ item['testimonial'] }}</p>
+            <cite>
+              <a href="{{ url_for('profile', alumni_id=item['id']) }}">{{ item['full_name']|display_name }}</a>
+              · {{ item['faculty_code']|faculty_name }}
+              {% if item['cohort_year'] %} · Angkatan {{ item['cohort_year'] }}{% endif %}
+            </cite>
+          </blockquote>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+{% if not current_user %}
+<section class="invite">
+  <h2>Nama Anda belum ada di sini?</h2>
+  <p>
+    Kalau Anda penerima beasiswa KSE di Unand tetapi belum tercatat, silakan daftar.
+    Kalau nama Anda sudah ada tetapi datanya belum lengkap, klaim dulu profilnya supaya bisa Anda perbarui sendiri.
+  </p>
+  <p class="toolbar">
+    <a class="btn" href="{{ url_for('register_alumni') }}">Daftar</a>
+    <a class="btn btn-ghost" href="{{ url_for('claim_profile') }}">Klaim profil saya</a>
+  </p>
+  <p class="fine">Setiap permintaan diperiksa pengurus dulu, jadi mohon ditunggu ya.</p>
+</section>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+{% if quotes %}<script src="{{ url_for('static', filename='js/carousel.js') }}" defer></script>{% endif %}
+{% endblock %}

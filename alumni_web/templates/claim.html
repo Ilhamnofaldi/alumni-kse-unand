@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Klaim profil · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="auth">
+  {% from "_brand.html" import seal_sm %}
+  {{ seal_sm("kse", "", 74, 58, "auth-crest") }}
+  <h1>Klaim profil yang sudah tercatat</h1>
+  <p>Untuk nama yang sudah ada di direktori. Cocokkan nama plus email atau WhatsApp yang tercatat. Angkatan membantu jika ada, tetapi boleh dikosongkan. Pengurus tetap memeriksa sebelum Anda bisa masuk.</p>
+  <form method="post">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Nama lengkap <input name="full_name" required autocomplete="name"></label>
+    <label>Angkatan <input name="cohort_year" inputmode="numeric" placeholder="Tahun masuk"></label>
+    <label>Email <input type="email" name="email" required autocomplete="email"></label>
+    <label>WhatsApp <input name="phone" inputmode="tel" autocomplete="tel"></label>
+    <label>Kata sandi baru <input type="password" name="password" required minlength="10" maxlength="128" autocomplete="new-password"></label>
+    <button class="btn" type="submit">Kirim permintaan</button>
+  </form>
+  <p class="fine">Nama belum ada di direktori? <a href="{{ url_for('register_alumni') }}">Daftar sebagai penerima KSE</a>.</p>
+</section>
+{% endblock %}

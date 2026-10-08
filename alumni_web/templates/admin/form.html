@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Ubah' if mode == 'edit' else 'Tambah' }} alumni · Pengurus{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('admin_home') }}">← Panel pengurus</a></p>
+<section class="auth wide">
+  <h1>{{ 'Ubah data alumni' if mode == 'edit' else 'Tambah alumni' }}</h1>
+  <p>Kolom yang dibiarkan kosong akan tercatat sebagai belum terdata, bukan sebagai tanda hubung.</p>
+  <form method="post" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Nama lengkap <input name="full_name" required value="{{ (alumni['full_name'] or '') if alumni else '' }}"></label>
+    <div class="split">
+      <label>Jenis kelamin
+        <select name="gender">
+          <option value="">Belum terdata</option>
+          <option value="Laki-laki" {% if alumni and alumni['gender'] == 'L' %}selected{% endif %}>Laki-laki</option>
+          <option value="Perempuan" {% if alumni and alumni['gender'] == 'P' %}selected{% endif %}>Perempuan</option>
+        </select>
+      </label>
+      <label>Tanggal lahir <input type="date" name="date_of_birth" value="{{ (alumni['date_of_birth'] or '') if alumni else '' }}"></label>
+    </div>
+    <div class="split">
+      <label>Fakultas
+        <select name="faculty">
+          <option value="">Belum terdata</option>
+          {% for code, label in faculties.items() %}
+            <option value="{{ code }}" {% if alumni and alumni['faculty_code'] == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Jurusan <input name="major" value="{{ (alumni['major_normalized'] or '') if alumni else '' }}"></label>
+    </div>
+    <div class="split">
+      <label>Angkatan <input name="cohort_year" inputmode="numeric" value="{{ (alumni['cohort_year'] or '') if alumni else '' }}"></label>
+      <label>Tahun lulus <input name="graduation_year" inputmode="numeric" value="{{ (alumni['graduation_year'] or '') if alumni else '' }}"></label>
+      <label>Tahun terakhir KSE <input name="kse_last_year" inputmode="numeric" value="{{ (alumni['kse_last_year'] or '') if alumni else '' }}"></label>
+    </div>
+    <div class="split">
+      <label>Status
+        <select name="status">
+          <option value="">Belum terdata</option>
+          {% for code, label in status_labels.items() %}
+            <option value="{{ code }}" {% if alumni and alumni['status_code'] == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Tempat kerja atau usaha <input name="workplace" value="{{ (alumni['workplace'] or '') if alumni else '' }}"></label>
+    </div>
+    <div class="split">
+      <label>WhatsApp <input name="phone" inputmode="tel" value="{{ (alumni['phone'] or '') if alumni else '' }}"></label>
+      <label>Email <input type="email" name="email" value="{{ (alumni['email'] or '') if alumni else '' }}"></label>
+    </div>
+    <label>Alamat domisili <textarea name="domicile" rows="2">{{ (alumni['domicile'] or '') if alumni else '' }}</textarea></label>
+    <label>Kesan dan pesan <textarea name="testimonial" rows="4">{{ (alumni['testimonial'] or '') if alumni else '' }}</textarea></label>
+    <label class="check">
+      <input type="checkbox" name="is_listed" value="1" {% if not alumni or alumni['is_listed'] %}checked{% endif %}>
+      Tampilkan di direktori publik
+    </label>
+    <button class="btn" type="submit">Simpan</button>
+  </form>
+  {% if mode == 'edit' and alumni and alumni['id'] %}
+    {% from "_roles.html" import role_history, role_form with context %}
+    <section class="roles-admin">
+      <h2>Jabatan di KSE</h2>
+      <p>Setiap jabatan menempel ke satu periode. Contoh tiga tahun berbeda status: <code>Anggota Humas 2022/2023; Koordinator Pendidikan 2023/2024; Wakil Ketua 2024/2025</code>. Catatan lama <code>Anggota Divisi</code> tanpa nama unit tetap sah sampai diperbarui.</p>
+      {{ role_history(roles, 'admin_delete_role', alumni['id']) }}
+      {{ role_form(url_for('admin_add_role', alumni_id=alumni['id']), show_bulk=True) }}
+    </section>
+  {% endif %}
+  {% if mode == 'edit' and alumni and alumni['id'] %}
+    <form method="post" action="{{ url_for('admin_invite', alumni_id=alumni['id']) }}" class="stack">
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <button class="btn btn-ghost" type="submit">Buat tautan undangan</button>
+    </form>
+  {% endif %}
+</section>
+{% endblock %}

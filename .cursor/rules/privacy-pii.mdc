@@ -1,0 +1,12 @@
+---
+description: Aturan PII alumni — telepon, email, alamat, tanggal lahir
+alwaysApply: true
+---
+
+# PII
+
+Publik: nama, fakultas, jurusan, angkatan, pekerjaan, kota, status, testimonial, jabatan paguyuban KSE.
+
+Login (akun berstatus `active`): WA, email, alamat, tanggal lahir.
+
+API peta hanya agregat kota dengan ambang `MAP_MIN_COUNT`. Setelah ambang terpenuhi, JSON boleh memuat nama publik (bukan WA/email/alamat/DOB). `strip_pii()` memakai daftar-izin: setiap kolom alumni baru wajib diklasifikasikan ke `PUBLIC_FIELDS`, `PII_FIELDS`, atau `INTERNAL_FIELDS` di `alumni_web/catalog.py`, dan field sensitif wajib punya asersi di `tests/test_privacy.py`.

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Bagan · Tahun · Pengurus{% endblock %}
+
+{% macro keep() %}
+  {% if view.year %}<input type="hidden" name="periode" value="{{ view.year }}">{% endif %}
+{% endmacro %}
+
+{% block content %}
+<p class="crumb">
+  <a href="{{ url_for('admin_home') }}">← Panel pengurus</a>
+  <a href="{{ url_for('org_chart', periode=view.year if view.year else 'semua') }}">Lihat bagan publik</a>
+</p>
+<section class="page-head">
+  <h1>Bagan</h1>
+  <p>Sunting satu tahun kepengurusan. Mengubah template tidak mengubah tahun yang sudah tampil.</p>
+  {% include "_org_switch.html" %}
+</section>
+
+<div class="org-stack">
+  <section class="org-nav-group">
+    <h2>Pilih tahun</h2>
+    <nav class="org-periods" aria-label="Periode kepengurusan">
+      {% for item in periods %}
+        <a class="chip {% if view.year == item.year %}chip-on{% endif %}"
+           href="{{ url_for('admin_org', periode=item.year) }}">{{ item.label }}</a>
+      {% endfor %}
+    </nav>
+    <details class="disclose">
+      <summary>Buka tahun lain</summary>
+      <form class="org-open" method="get" action="{{ url_for('admin_org') }}">
+        <label for="buka-periode">Tahun mulai</label>
+        <input id="buka-periode" name="periode" type="number" min="1990" max="2100" step="1"
+               inputmode="numeric" placeholder="2026">
+        <button class="btn btn-ghost" type="submit">Buka</button>
+      </form>
+    </details>
+  </section>
+
+  {% if view.year and scope.kind == 'period_template' %}
+    <section class="scope-bar is-locked">
+      <p class="scope-kicker">Mengikuti template</p>
+      <h2>{{ view.year }}/{{ view.year + 1 }}</h2>
+      <p>
+        Tahun ini mengikuti {{ blueprint.title if blueprint else 'template bawaan' }}.
+        Siapkan salinan sendiri jika ingin mengubah tahun ini saja.
+      </p>
+      <details class="disclose">
+        <summary>Siapkan bagan tahun ini</summary>
+        <form method="post" action="{{ url_for('admin_org_copy') }}" class="stack">
+          <input type="hidden" name="csrf" value="{{ csrf_token }}">
+          <input type="hidden" name="periode" value="{{ view.year }}">
+          <label>Mulai dari template
+            <select name="sumber">
+              {% for item in templates %}
+                <option value="{{ item.slug }}" {% if item.slug == default_slug %}selected{% endif %}>
+                  {{ item.title }}{% if item.is_default %} (bawaan){% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+          <button class="btn" type="submit">Siapkan bagan {{ view.year }}/{{ view.year + 1 }}</button>
+        </form>
+      </details>
+    </section>
+  {% elif not view.year %}
+    <section class="scope-bar is-locked">
+      <p class="scope-kicker">Belum ada periode</p>
+      <h2>Belum ada tahun kepengurusan yang tampil</h2>
+      <p>Bagan muncul setelah ada alumni yang mengisi riwayat jabatan, atau setelah Anda membuka tahun di atas lalu menyiapkannya.</p>
+    </section>
+  {% elif view.year and scope.kind == 'period_custom' %}
+    <section class="scope-bar">
+      <p class="scope-kicker">Bagan sendiri</p>
+      <h2>{{ view.year }}/{{ view.year + 1 }}</h2>
+      <p>
+        Perubahan hanya untuk tahun ini.
+        {% if blueprint.source %}Disalin dari {{ blueprint.source.title }}.{% endif %}
+      </p>
+      <details class="disclose">
+        <summary>Ganti dari template</summary>
+        <form method="post" action="{{ url_for('admin_org_copy') }}" class="stack" data-confirm="Ganti bagan tahun ini dengan template yang dipilih? Penyesuaian tahun ini hilang.">
+          <input type="hidden" name="csrf" value="{{ csrf_token }}">
+          <input type="hidden" name="periode" value="{{ view.year }}">
+          <label>Template
+            <select name="sumber">
+              {% for item in templates %}
+                <option value="{{ item.slug }}" {% if item.slug == default_slug %}selected{% endif %}>
+                  {{ item.title }}{% if item.is_default %} (bawaan){% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+          <button class="btn btn-ghost" type="submit">Terapkan template ini</button>
+        </form>
+      </details>
+    </section>
+  {% endif %}
+</div>
+
+{% if blueprint %}
+  {% include "admin/_org_editor.html" %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/org-editor.js') }}" defer></script>
+{% endblock %}

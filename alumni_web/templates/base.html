@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Direktori Alumni KSE UNAND{% endblock %}</title>
+  <meta name="description" content="Direktori alumni penerima beasiswa Karya Salemba Empat Universitas Andalas.">
+  {% if not allow_indexing %}<meta name="robots" content="noindex, nofollow">{% endif %}
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}" type="image/png">
+  <link rel="preload" href="{{ url_for('static', filename='vendor/fonts/figtree-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <a class="skip" href="#isi">Loncat ke isi</a>
+  <header class="mast">
+    <div class="mast-inner">
+      <a class="mark" href="{{ url_for('home') }}">
+        <img src="{{ url_for('static', filename='img/kse-sm.png') }}" alt="" width="46">
+        <span>
+          <span class="mark-kicker">Direktori Alumni</span>
+          <span class="mark-title">Karya Salemba Empat</span>
+          <span class="mark-sub">Universitas Andalas</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Navigasi utama">
+        <a href="{{ url_for('directory') }}" {% if request.endpoint == 'directory' %}aria-current="page"{% endif %}>Direktori</a>
+        <a href="{{ url_for('org_chart') }}" {% if request.endpoint == 'org_chart' %}aria-current="page"{% endif %}>Struktur</a>
+        <a href="{{ url_for('stats_page') }}" {% if request.endpoint == 'stats_page' %}aria-current="page"{% endif %}>Statistik</a>
+        <a href="{{ url_for('map_page') }}" {% if request.endpoint == 'map_page' %}aria-current="page"{% endif %}>Sebaran</a>
+        {% if current_user %}
+          <span class="nav-gap" aria-hidden="true"></span>
+          {% if current_user['role'] == 'admin' %}
+            <a href="{{ url_for('admin_home') }}" {% if request.endpoint and request.endpoint.startswith('admin') and request.endpoint != 'admin_review' %}aria-current="page"{% endif %}>Pengurus</a>
+            <a class="nav-queue" href="{{ url_for('admin_review') }}" {% if request.endpoint == 'admin_review' %}aria-current="page"{% endif %}>
+              Tinjau
+              {% if review and review.total %}<span class="pill">{{ review.total }}</span>{% endif %}
+            </a>
+          {% else %}
+            <a href="{{ url_for('own_profile') }}" {% if request.endpoint and request.endpoint.startswith('own_') %}aria-current="page"{% endif %}>Profil saya</a>
+          {% endif %}
+          <form class="inline" method="post" action="{{ url_for('logout') }}">
+            <input type="hidden" name="csrf" value="{{ csrf_token }}">
+            <button class="linkish danger" type="submit">Keluar</button>
+          </form>
+        {% else %}
+          <span class="nav-gap" aria-hidden="true"></span>
+          <a href="{{ url_for('register_alumni') }}" {% if request.endpoint == 'register_alumni' %}aria-current="page"{% endif %}>Daftar</a>
+          <a class="nav-cta" href="{{ url_for('login') }}">Masuk</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flashes">
+        {% for cat, msg in messages %}
+          <p class="flash flash-{{ cat }}" role="{{ 'alert' if cat == 'err' else 'status' }}">{{ msg }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main id="isi">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="colophon">
+    <div class="colophon-inner">
+      <div class="seal-row">
+        {% from "_brand.html" import seal_sm %}
+        {{ seal_sm("kse", "Lambang Paguyuban Karya Salemba Empat Universitas Andalas", 66, 66, "seal-kse", true) }}
+        {{ seal_sm("unand", "Lambang Universitas Andalas", 74, 74, "seal-unand", true) }}
+      </div>
+      <div class="colophon-text">
+        <p>Direktori Alumni Penerima Beasiswa Karya Salemba Empat — Universitas Andalas</p>
+        <p class="fine">Dikelola bersama oleh pengurus Paguyuban KSE UNAND. Kalau ada data yang keliru, sampaikan saja kepada pengurus supaya bisa kami perbaiki.</p>
+        <p class="fine">WhatsApp dan email hanya bisa dilihat anggota yang sudah masuk. Alamat dan tanggal lahir hanya pemilik profil dan pengurus. Peta hanya menandai kota, bukan alamat rumah.</p>
+        <p class="fine"><a href="{{ url_for('static', filename='docs/pedoman-pengguna.pdf') }}">Buku saku alumni</a> — panduan singkat cara memakai direktori, mendaftar, dan menjaga data pribadi.</p>
+      </div>
+    </div>
+  </footer>
+  <script src="{{ url_for('static', filename='js/confirm.js') }}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

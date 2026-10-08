@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Tinjau · Pengurus{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('admin_home') }}">← Panel pengurus</a></p>
+<section class="page-head">
+  <h1>Tinjau keanggotaan</h1>
+  <p>Setujui orang yang Anda kenali lewat grup paguyuban. Satu akun aktif dapat melihat WhatsApp dan email seluruh alumni yang tampil. Alamat dan tanggal lahir hanya pemilik dan pengurus.</p>
+</section>
+
+<section class="review-block">
+  <h2>Akun menunggu ({{ pending_users|length }})</h2>
+  <div class="table-wrap">
+    <table class="grid">
+      <thead>
+        <tr>
+          <th scope="col">Nama</th>
+          <th scope="col">Email</th>
+          <th scope="col">Asal data</th>
+          <th scope="col">Diminta</th>
+          <th scope="col"><span class="sr">Aksi</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in pending_users %}
+          <tr>
+            <td>
+              {% if row['alumni_id'] %}
+                <a href="{{ url_for('admin_edit', alumni_id=row['alumni_id']) }}">{{ row['full_name'] or '—' }}</a>
+              {% else %}
+                {{ row['full_name'] or '—' }}
+              {% endif %}
+              {% if row['is_listed'] %}<span class="pill">tampil</span>{% else %}<span class="pill">tersembunyi</span>{% endif %}
+            </td>
+            <td>{{ row['email'] }}</td>
+            <td>{{ source_labels.get(row['source'], row['source'] or '—') }}{% if row['cohort_year'] %} · {{ row['cohort_year'] }}{% endif %}</td>
+            <td class="fine">
+              {{ (row['created_at'] or '')[:16]|replace('T', ' ') }}
+              {%- if row['request_ip'] %}<br>IP {{ row['request_ip'] }}{% endif %}
+            </td>
+            <td class="row-actions">
+              <form method="post" action="{{ url_for('admin_review_user', user_id=row['id'], action='setujui-tampil') }}">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <button class="linkish" type="submit">Setujui dan tampilkan</button>
+              </form>
+              <form method="post" action="{{ url_for('admin_review_user', user_id=row['id'], action='setujui') }}">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <button class="linkish" type="submit">Hanya aktifkan akun</button>
+              </form>
+              <form method="post" action="{{ url_for('admin_review_user', user_id=row['id'], action='tolak') }}" data-confirm="Tolak permintaan ini? Data pendaftaran baru akan dihapus supaya email bisa dipakai lagi.">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <button class="linkish danger" type="submit">Tolak</button>
+              </form>
+              {% if row['source'] == 'self_register' %}
+              <form method="post" action="{{ url_for('admin_review_user', user_id=row['id'], action='tolak-hapus') }}" data-confirm="Hapus juga baris data pendaftaran ini?">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <button class="linkish danger" type="submit">Tolak dan hapus</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5"><span class="muted">Tidak ada akun menunggu.</span></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="review-block">
+  <h2>Permintaan alumni ({{ requests|length }})</h2>
+  <div class="table-wrap">
+    <table class="grid">
+      <thead>
+        <tr>
+          <th scope="col">Nama</th>
+          <th scope="col">Jenis</th>
+          <th scope="col">Isi</th>
+          <th scope="col"><span class="sr">Aksi</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in requests %}
+          <tr>
+            <td><a href="{{ url_for('admin_edit', alumni_id=row['alumni_id']) }}">{{ row['full_name'] }}</a></td>
+            <td><span class="pill">{{ kind_labels.get(row['kind'], row['kind']) }}</span></td>
+            <td class="fine">{{ row['payload'] }}</td>
+            <td class="row-actions">
+              <form method="post" action="{{ url_for('admin_review_request', req_id=row['id'], action='setujui') }}">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <button class="linkish" type="submit">Setujui</button>
+              </form>
+              {% if row['kind'] == 'reset' %}
+              <form method="post" action="{{ url_for('admin_review_request', req_id=row['id'], action='tautkan-pulih') }}">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <button class="linkish" type="submit">Buat tautan</button>
+              </form>
+              {% endif %}
+              <form method="post" action="{{ url_for('admin_review_request', req_id=row['id'], action='tolak') }}">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <button class="linkish danger" type="submit">Tolak</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4"><span class="muted">Tidak ada permintaan.</span></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="review-block">
+  <h2>Kerangka belum ditampilkan ({{ waiting|length }}{% if waiting_total and waiting_total > waiting|length %} dari {{ waiting_total }}{% endif %})</h2>
+  <div class="table-wrap">
+    <table class="grid">
+      <thead>
+        <tr>
+          <th scope="col">Nama</th>
+          <th scope="col">Asal</th>
+          <th scope="col"><span class="sr">Aksi</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in waiting %}
+          <tr>
+            <td><a href="{{ url_for('admin_edit', alumni_id=row['id']) }}">{{ row['full_name'] }}</a></td>
+            <td>{{ source_labels.get(row['source'], row['source']) }}{% if row['cohort_year'] %} · {{ row['cohort_year'] }}{% endif %}</td>
+            <td class="row-actions">
+              <form method="post" action="{{ url_for('admin_list_alumni', alumni_id=row['id']) }}">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <button class="linkish" type="submit">Tampilkan</button>
+              </form>
+              <form method="post" action="{{ url_for('admin_invite', alumni_id=row['id']) }}">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <button class="linkish" type="submit">Buat undangan</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="3"><span class="muted">Tidak ada kerangka menunggu.</span></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

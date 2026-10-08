@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Lupa kata sandi · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="auth">
+  <h1>Lupa kata sandi</h1>
+  <p>Pengurus akan memeriksa permintaan, lalu mengirim tautan pemulihan lewat jalur yang sudah dikenal (biasanya grup WhatsApp paguyuban). Situs ini tidak mengirim email otomatis.</p>
+  <form method="post">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Email akun <input type="email" name="email" required autocomplete="email"></label>
+    <button class="btn" type="submit">Kirim permintaan</button>
+  </form>
+  <p class="fine">Pengurus yang lupa sandi memakai <a href="{{ url_for('recover_admin') }}">kode pemulih</a> atau perintah di server. Sudah ingat? <a href="{{ url_for('login') }}">Masuk</a>.</p>
+</section>
+{% endblock %}

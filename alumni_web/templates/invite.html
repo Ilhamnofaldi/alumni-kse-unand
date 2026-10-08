@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Lengkapi undangan · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="auth wide">
+  <h1>Lengkapi undangan</h1>
+  <p>{{ alumni.full_name|display_name }}{% if alumni.cohort_year %} · Angkatan {{ alumni.cohort_year }}{% endif %}{% if alumni.faculty_code %} · {{ alumni.faculty_code|faculty_name }}{% endif %}. Setel kata sandi; pengurus masih memeriksa sebelum akun bisa dipakai masuk.</p>
+  <form method="post" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    {% if alumni.email %}
+      <p class="locked"><span>Email akun</span> memakai alamat yang sudah tercatat. Tidak ditampilkan di halaman ini.</p>
+    {% else %}
+      <label>Email <input type="email" name="email" required autocomplete="email"></label>
+    {% endif %}
+    <label>Kata sandi akun <input type="password" name="password" required minlength="10" maxlength="128" autocomplete="new-password"></label>
+    <button class="btn" type="submit">Simpan dan kirim ke pengurus</button>
+  </form>
+</section>
+{% endblock %}

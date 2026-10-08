@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Sebaran · Alumni KSE UNAND{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet.css') }}">
+{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Sebaran alumni</h1>
+  <p>Setiap titik menandai satu kota atau kabupaten, bukan alamat rumah siapa pun. Sebuah kota baru muncul di peta kalau ada sekurang-kurangnya {{ min_count }} alumni di sana, supaya satu titik tidak menunjuk ke satu orang saja.</p>
+</section>
+<div class="map-layout">
+  <div id="map" class="map" aria-label="Peta sebaran alumni"></div>
+  <aside class="map-panel">
+    <h2>Kota yang tampil</h2>
+    <p class="fine">Klik nama kota untuk menggeser peta ke sana. Daftarnya juga bisa langsung dibaca tanpa membuka peta.</p>
+    <ul class="map-cities" data-map-cities>
+      {% for point in points %}
+        <li>
+          <button type="button" class="city-jump" data-city="{{ point.city }}" data-lat="{{ point.lat }}" data-lng="{{ point.lng }}">
+            <strong>{{ point.city }}</strong>
+            <span>{{ point.count }} alumni{% if point.province %} · {{ point.province }}{% endif %}</span>
+          </button>
+          <ul class="map-alumni">
+            {% for person in point.alumni[:8] %}
+              <li>
+                <a href="{{ url_for('profile', alumni_id=person.id) }}">{{ person.full_name|display_name }}</a>
+                {% if person.cohort_year %} · {{ person.cohort_year }}{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+          {% if point.count > 8 or point.count > point.alumni|length %}
+            <p class="fine"><a href="{{ url_for('directory', kota=point.city) }}">Lihat semua di direktori</a></p>
+          {% endif %}
+        </li>
+      {% else %}
+        <li>
+          <p class="empty">Belum ada kota yang mencapai jumlah minimum tadi.</p>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/leaflet.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ reveal.kind }} · Pengurus{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('admin_review') }}">← Tinjau</a></p>
+<section class="page-head">
+  <h1>{{ reveal.kind }}</h1>
+  <p>{{ reveal.note }} Halaman ini hanya tampil sekali.</p>
+</section>
+<ol class="reveal-list">
+  {% for item in reveal.entries %}
+    <li><code>{{ item }}</code></li>
+  {% endfor %}
+</ol>
+<p class="fine">Salin sekarang. Muat ulang halaman akan menghilangkan daftar ini.</p>
+{% endblock %}

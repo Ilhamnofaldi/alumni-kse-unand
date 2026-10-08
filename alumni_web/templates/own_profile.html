@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Profil saya · Alumni KSE UNAND{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Profil saya</h1>
+  <p>Ubah pekerjaan, kota, dan kontak. Nama yang sudah terisi dikunci. Isian yang masih kosong (angkatan, jurusan, fakultas) boleh Anda lengkapi sendiri.</p>
+  <p class="fine"><a href="{{ url_for('change_password') }}">Ganti kata sandi</a></p>
+</section>
+
+{% if gaps.faculty or gaps.major or gaps.cohort or gaps.city %}
+  <p class="flash flash-warn" role="status">
+    Beberapa identitas masih kosong.
+    {% if gaps.cohort %}Isi angkatan.{% endif %}
+    {% if gaps.city %}Isi kota atau alamat.{% endif %}
+    {% if gaps.faculty %}Pilih fakultas.{% endif %}
+    {% if gaps.major %}Isi jurusan.{% endif %}
+  </p>
+{% endif %}
+
+{% if pending %}
+  <p class="fine">Permintaan menunggu pengurus:
+    {% for row in pending %}{{ kind_labels.get(row['kind'], row['kind']) }}{% if not loop.last %}, {% endif %}{% endfor %}.
+  </p>
+{% endif %}
+
+<section class="auth wide">
+  <form method="post" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <div class="split">
+      <p class="locked"><span>Nama</span> {{ alumni.full_name|display_name }}</p>
+      {% if gaps.faculty %}
+        <label>Fakultas
+          <select name="faculty">
+            <option value="">Belum terdata</option>
+            {% for code, label in faculties.items() %}
+              <option value="{{ code }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      {% else %}
+        <p class="locked"><span>Fakultas</span> {{ alumni.faculty_code|faculty_name }}</p>
+      {% endif %}
+    </div>
+    <div class="split">
+      {% if gaps.major %}
+        <label>Jurusan <input name="major" value="{{ alumni.major_normalized or alumni.major_raw or '' }}"></label>
+      {% else %}
+        <p class="locked"><span>Jurusan</span> {{ alumni.major_normalized or alumni.major_raw or 'Belum terdata' }}</p>
+      {% endif %}
+      {% if gaps.cohort %}
+        <label>Angkatan <input name="cohort_year" inputmode="numeric" placeholder="Tahun masuk"></label>
+      {% else %}
+        <p class="locked"><span>Angkatan</span> {{ alumni.cohort_year or 'Belum terdata' }}</p>
+      {% endif %}
+    </div>
+    {% if gaps.gender %}
+      <label>Alumni
+        <select name="gender">
+          <option value="">Belum terdata</option>
+          <option value="L">Laki-laki</option>
+          <option value="P">Perempuan</option>
+        </select>
+      </label>
+    {% endif %}
+    <div class="split">
+      <label>Status
+        <select name="status">
+          <option value="">Belum terdata</option>
+          {% for code, label in status_labels.items() %}
+            <option value="{{ code }}" {% if alumni.status_code == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Tempat kerja atau usaha <input name="workplace" value="{{ alumni.workplace or '' }}"></label>
+    </div>
+    <label>Kota atau alamat domisili <textarea name="domicile" rows="2">{{ alumni.domicile or '' }}</textarea></label>
+    <div class="split">
+      <label>WhatsApp <input name="phone" inputmode="tel" value="{{ alumni.phone or '' }}"></label>
+      <label>Tanggal lahir <input type="date" name="date_of_birth" value="{{ alumni.date_of_birth or '' }}"></label>
+    </div>
+    <div class="split">
+      <label>Tahun lulus <input name="graduation_year" inputmode="numeric" value="{{ alumni.graduation_year or '' }}"></label>
+      <label>Tahun terakhir KSE <input name="kse_last_year" inputmode="numeric" value="{{ alumni.kse_last_year or '' }}"></label>
+    </div>
+    <label>Kesan dan pesan <textarea name="testimonial" rows="4">{{ alumni.testimonial or '' }}</textarea></label>
+    <p class="fine">Jangan tulis nomor, email, atau tautan di kesan pesan — teks itu tampil publik.</p>
+    <button class="btn" type="submit">Simpan perubahan</button>
+  </form>
+</section>
+
+{% from "_roles.html" import role_history, role_form with context %}
+<section class="auth wide">
+  <h2>Jabatan di KSE</h2>
+  <p>Status menempel ke periode kepengurusan, bukan ke nama secara tetap. Satu orang boleh punya banyak catatan: jabatan berbeda tiap tahun, atau jabatan yang sama di tahun lain.</p>
+  {{ role_history(roles|default([]), 'own_delete_role', none) }}
+  {{ role_form(url_for('own_add_role')) }}
+</section>
+
+<section class="auth wide">
+  <h2>Email</h2>
+  <p class="locked"><span>Email saat ini</span> {{ alumni.email or 'Belum terdata' }}</p>
+  <form method="post" action="{{ url_for('own_email_change') }}" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Email baru <input type="email" name="email" required autocomplete="email"></label>
+    <button class="btn btn-ghost" type="submit">Ajukan ganti email</button>
+  </form>
+</section>
+
+<section class="auth wide">
+  <h2>Koreksi identitas</h2>
+  <p>Jika nama, fakultas, jurusan, atau angkatan yang sudah terisi salah, tulis perbaikannya. Pengurus yang mengubah data yang terkunci.</p>
+  <form method="post" action="{{ url_for('own_identity_fix') }}" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Penjelasan <textarea name="note" rows="3" required minlength="8" placeholder="Contoh: jurusan seharusnya Agroekoteknologi, angkatan 2014"></textarea></label>
+    <button class="btn btn-ghost" type="submit">Kirim koreksi</button>
+  </form>
+</section>
+
+<section class="auth wide">
+  <h2>Direktori publik</h2>
+  <p>{% if alumni.is_listed %}Nama Anda saat ini tampil di direktori.{% else %}Nama Anda tidak tampil di direktori publik.{% endif %}</p>
+  {% if alumni.is_listed %}
+  <form method="post" action="{{ url_for('own_hide') }}">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <button class="btn btn-ghost" type="submit">Minta nama disembunyikan</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

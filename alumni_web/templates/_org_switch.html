@@ -1,0 +1,6 @@
+<nav class="org-tabs" aria-label="Bagian bagan">
+  <a href="{{ url_for('admin_org') }}"
+     {% if request.endpoint == 'admin_org' %}aria-current="page"{% endif %}>Tahun kepengurusan</a>
+  <a href="{{ url_for('admin_acuan') }}"
+     {% if request.endpoint == 'admin_acuan' %}aria-current="page"{% endif %}>Template bagan</a>
+</nav>
